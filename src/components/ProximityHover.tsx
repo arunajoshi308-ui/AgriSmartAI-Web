@@ -22,35 +22,32 @@ interface ProximityHoverProps {
     gap?: number;
     influence?: number;
     style?: CSSProperties;
+    /** Optional secondary color for gradient fill effect */
+    gradientColor?: string;
+    /** Enable rotation animation on particles */
+    rotateOnHover?: boolean;
+    /** Auto-pulse: particles gently breathe even without mouse */
+    autoPulse?: boolean;
 }
-
-const DEFAULTS = {
-    shape: "rounded" as Shape,
-    fill: "solid" as const,
-    strokeWidth: 1.5,
-    particleColor: "#FFFFFF",
-    backgroundColor: "#000000",
-    maxSize: 36,
-    minSize: 12,
-    gap: 4,
-    influence: 300,
-};
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (v: number, min: number, max: number) =>
     Math.max(min, Math.min(max, v));
 
 export default function ProximityHover({
-    shape = DEFAULTS.shape,
-    fill = DEFAULTS.fill,
-    strokeWidth = DEFAULTS.strokeWidth,
-    particleColor = DEFAULTS.particleColor,
-    backgroundColor = DEFAULTS.backgroundColor,
-    maxSize = DEFAULTS.maxSize,
-    minSize = DEFAULTS.minSize,
-    gap = DEFAULTS.gap,
-    influence = DEFAULTS.influence,
+    shape = "rounded",
+    fill = "solid",
+    strokeWidth = 1.5,
+    particleColor = "#FFFFFF",
+    backgroundColor = "#000000",
+    maxSize = 36,
+    minSize = 12,
+    gap = 4,
+    influence = 300,
     style,
+    gradientColor,
+    rotateOnHover = false,
+    autoPulse = false,
 }: ProximityHoverProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -58,41 +55,19 @@ export default function ProximityHover({
     const mouseRef = useRef<{ x: number; y: number } | null>(null);
     const sizeRef = useRef({ w: 0, h: 0, dpr: 1 });
     const propsRef = useRef({
-        shape,
-        fill,
-        strokeWidth,
-        particleColor,
-        backgroundColor,
-        maxSize,
-        minSize,
-        gap,
-        influence,
+        shape, fill, strokeWidth, particleColor, backgroundColor,
+        maxSize, minSize, gap, influence, gradientColor, rotateOnHover, autoPulse,
     });
     const currentRef = useRef<Float32Array>(new Float32Array(0));
+    const rotationRef = useRef<Float32Array>(new Float32Array(0));
+    const pulseRef = useRef(0);
 
     useEffect(() => {
         propsRef.current = {
-            shape,
-            fill,
-            strokeWidth,
-            particleColor,
-            backgroundColor,
-            maxSize,
-            minSize,
-            gap,
-            influence,
+            shape, fill, strokeWidth, particleColor, backgroundColor,
+            maxSize, minSize, gap, influence, gradientColor, rotateOnHover, autoPulse,
         };
-    }, [
-        shape,
-        fill,
-        strokeWidth,
-        particleColor,
-        backgroundColor,
-        maxSize,
-        minSize,
-        gap,
-        influence,
-    ]);
+    }, [shape, fill, strokeWidth, particleColor, backgroundColor, maxSize, minSize, gap, influence, gradientColor, rotateOnHover, autoPulse]);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -115,17 +90,20 @@ export default function ProximityHover({
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         };
 
-        const buildPath = (cx: number, cy: number, s: number, shp: Shape) => {
+        const buildPath = (cx: number, cy: number, s: number, shp: Shape, rot: number) => {
             const half = s / 2;
+            ctx.save();
+            ctx.translate(cx, cy);
+            if (rot) ctx.rotate(rot);
             ctx.beginPath();
             switch (shp) {
                 case "circle":
-                    ctx.arc(cx, cy, half, 0, Math.PI * 2);
+                    ctx.arc(0, 0, half, 0, Math.PI * 2);
                     break;
                 case "rounded": {
                     const r = Math.min(half, s * 0.28);
-                    const x = cx - half;
-                    const y = cy - half;
+                    const x = -half;
+                    const y = -half;
                     ctx.moveTo(x + r, y);
                     ctx.arcTo(x + s, y, x + s, y + s, r);
                     ctx.arcTo(x + s, y + s, x, y + s, r);
@@ -135,23 +113,23 @@ export default function ProximityHover({
                     break;
                 }
                 case "triangle":
-                    ctx.moveTo(cx, cy - half);
-                    ctx.lineTo(cx + half, cy + half);
-                    ctx.lineTo(cx - half, cy + half);
+                    ctx.moveTo(0, -half);
+                    ctx.lineTo(half, half);
+                    ctx.lineTo(-half, half);
                     ctx.closePath();
                     break;
                 case "diamond":
-                    ctx.moveTo(cx, cy - half);
-                    ctx.lineTo(cx + half, cy);
-                    ctx.lineTo(cx, cy + half);
-                    ctx.lineTo(cx - half, cy);
+                    ctx.moveTo(0, -half);
+                    ctx.lineTo(half, 0);
+                    ctx.lineTo(0, half);
+                    ctx.lineTo(-half, 0);
                     ctx.closePath();
                     break;
                 case "hexagon":
                     for (let k = 0; k < 6; k++) {
                         const a = ((-90 + 60 * k) * Math.PI) / 180;
-                        const px = cx + half * Math.cos(a);
-                        const py = cy + half * Math.sin(a);
+                        const px = half * Math.cos(a);
+                        const py = half * Math.sin(a);
                         if (k === 0) ctx.moveTo(px, py);
                         else ctx.lineTo(px, py);
                     }
@@ -162,8 +140,8 @@ export default function ProximityHover({
                     for (let k = 0; k < 10; k++) {
                         const rad = k % 2 === 0 ? half : inner;
                         const a = ((-90 + 36 * k) * Math.PI) / 180;
-                        const px = cx + rad * Math.cos(a);
-                        const py = cy + rad * Math.sin(a);
+                        const px = rad * Math.cos(a);
+                        const py = rad * Math.sin(a);
                         if (k === 0) ctx.moveTo(px, py);
                         else ctx.lineTo(px, py);
                     }
@@ -171,8 +149,9 @@ export default function ProximityHover({
                     break;
                 }
                 default:
-                    ctx.rect(cx - half, cy - half, s, s);
+                    ctx.rect(-half, -half, s, s);
             }
+            ctx.restore();
         };
 
         const draw = () => {
@@ -192,17 +171,36 @@ export default function ProximityHover({
             const offX = (w - cols * cell) / 2 + cell / 2;
             const offY = (h - rows * cell) / 2 + cell / 2;
             const count = cols * rows;
+
             if (currentRef.current.length !== count) {
                 currentRef.current = new Float32Array(count).fill(p.minSize);
+                rotationRef.current = new Float32Array(count).fill(0);
             }
             const sizes = currentRef.current;
+            const rotations = rotationRef.current;
 
-            ctx.fillStyle = p.particleColor;
+            // Auto pulse
+            if (p.autoPulse) {
+                pulseRef.current += 0.015;
+            }
+            const pulseVal = p.autoPulse ? Math.sin(pulseRef.current) * 0.15 : 0;
+
             ctx.strokeStyle = p.particleColor;
+            ctx.fillStyle = p.particleColor;
             ctx.lineJoin = "round";
             ctx.lineWidth = Math.max(0.5, p.strokeWidth);
 
             const radius = Math.max(1, p.influence);
+
+            // Gradient support
+            if (p.gradientColor) {
+                const grad = ctx.createLinearGradient(0, 0, w, h);
+                grad.addColorStop(0, p.particleColor);
+                grad.addColorStop(1, p.gradientColor);
+                ctx.fillStyle = grad;
+                ctx.strokeStyle = grad;
+            }
+
             for (let j = 0; j < rows; j++) {
                 for (let i = 0; i < cols; i++) {
                     const idx = j * cols + i;
@@ -215,11 +213,25 @@ export default function ProximityHover({
                         const dist = Math.sqrt(dx * dx + dy * dy);
                         infl = clamp(1 - dist / radius, 0, 1);
                     }
-                    const target = lerp(p.minSize, p.maxSize, infl);
-                    const cur = lerp(sizes[idx] || p.minSize, target, 0.2);
+
+                    // Add auto-pulse wave effect
+                    if (p.autoPulse) {
+                        const waveInfl = Math.sin(pulseRef.current + (i + j) * 0.3) * 0.2;
+                        infl = clamp(infl + Math.abs(waveInfl) * 0.3, 0, 1);
+                    }
+
+                    const target = lerp(p.minSize, p.maxSize, infl + pulseVal * infl);
+                    const cur = lerp(sizes[idx] || p.minSize, target, 0.15);
                     sizes[idx] = cur;
+
+                    // Rotation
+                    if (p.rotateOnHover) {
+                        const rotTarget = infl * Math.PI;
+                        rotations[idx] = lerp(rotations[idx] || 0, rotTarget, 0.1);
+                    }
+
                     if (cur <= 0.2) continue;
-                    buildPath(cx, cy, cur, p.shape);
+                    buildPath(cx, cy, cur, p.shape, rotations[idx] || 0);
                     if (isStroke) ctx.stroke();
                     else ctx.fill();
                 }
@@ -229,14 +241,9 @@ export default function ProximityHover({
 
         const onMove = (e: PointerEvent) => {
             const rect = container.getBoundingClientRect();
-            mouseRef.current = {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-            };
+            mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
         };
-        const onLeave = () => {
-            mouseRef.current = null;
-        };
+        const onLeave = () => { mouseRef.current = null; };
 
         syncSize();
         const ro = new ResizeObserver(syncSize);
