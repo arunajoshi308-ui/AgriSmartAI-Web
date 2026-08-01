@@ -29,7 +29,7 @@ export default function RootLayout({
             AgriSmart AI 🌾 — Built by Class 9 Student Innovators
           </p>
           <p className="text-xs mt-2 text-bento-lime font-bold">
-            Shourya • Pranav J • Pratyush • Pranav K • Rohan • Krutik
+            Shourya • Pranav J • Pratyush • Pranav K • Rohan • Krutik • Myank • Nikunj
           </p>
           <p className="text-xs mt-2 text-bento-bg/60">
             Powered by Gemini 3.5 Flash • Open Source on GitHub

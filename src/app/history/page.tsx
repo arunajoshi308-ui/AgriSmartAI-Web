@@ -44,11 +44,11 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4 page-enter">
       {/* Header */}
-      <div className="bento-card bg-bento-warm p-4 flex items-center justify-between">
+      <div className="bento-card bg-bento-warm p-4 flex items-center justify-between animate-slideDown hover-lift">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-bento-dark flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-bento-dark flex items-center justify-center animate-float">
             <span className="text-bento-warm text-lg">🕘</span>
           </div>
           <div>
@@ -61,7 +61,7 @@ export default function HistoryPage() {
         {history.length > 0 && (
           <button
             onClick={clearAll}
-            className="text-xs font-black text-bento-olive hover:text-bento-orange transition-colors"
+            className="text-xs font-black text-bento-olive hover:text-bento-orange transition-colors hover:scale-105 active:scale-95"
           >
             Clear All
           </button>
@@ -70,15 +70,15 @@ export default function HistoryPage() {
 
       {/* Empty State */}
       {history.length === 0 ? (
-        <div className="bento-card bg-white p-8 text-center">
-          <div className="text-5xl mb-4">🌱</div>
+        <div className="bento-card bg-white p-8 text-center animate-bounceIn hover-lift">
+          <div className="text-5xl mb-4 animate-float">🌱</div>
           <h3 className="font-black text-bento-dark text-base mb-1">No Scans Yet</h3>
           <p className="text-sm font-bold text-bento-olive mb-4">
             Start scanning plant leaves to build your history
           </p>
           <a
             href="/scanner"
-            className="inline-block bg-bento-lime bento-border rounded-2xl px-6 py-3 font-black text-sm text-bento-dark hover:opacity-80 transition-opacity"
+            className="inline-block bg-bento-lime bento-border rounded-2xl px-6 py-3 font-black text-sm text-bento-dark hover:scale-105 active:scale-95 transition-all press"
           >
             📷 Open Disease Scanner
           </a>
@@ -87,9 +87,13 @@ export default function HistoryPage() {
         /* History List */
         <div className="space-y-3">
           {history.map((record, i) => (
-            <div key={i} className="bento-card bg-white overflow-hidden">
+            <div
+              key={i}
+              className="bento-card bg-white overflow-hidden hover-lift animate-slideUp"
+              style={{ animationDelay: `${0.08 * (i + 1)}s` }}
+            >
               <div
-                className="p-4 cursor-pointer"
+                className="p-4 cursor-pointer transition-all hover:bg-bento-bg/50"
                 onClick={() => setExpanded(expanded === i ? null : i)}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -99,7 +103,7 @@ export default function HistoryPage() {
                       <img
                         src={record.image}
                         alt={record.cropName}
-                        className="w-12 h-12 rounded-xl object-cover bento-border"
+                        className="w-12 h-12 rounded-xl object-cover bento-border transition-transform hover:scale-110"
                       />
                     )}
                     <div>
@@ -110,7 +114,7 @@ export default function HistoryPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black ${statusColors[record.healthStatus] || statusColors.WARNING}`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black animate-pop ${statusColors[record.healthStatus] || statusColors.WARNING}`}>
                       {record.healthStatus}
                     </span>
                     <span className="text-xs font-black text-bento-dark">{record.confidence}%</span>
@@ -120,22 +124,22 @@ export default function HistoryPage() {
                   {record.symptoms}
                 </p>
                 {expanded === i && (
-                  <div className="mt-3 pt-3 border-t-2 border-bento-dark/10 space-y-3 animate-fadeIn">
-                    <div>
+                  <div className="mt-3 pt-3 border-t-2 border-bento-dark/10 space-y-3 animate-slideUp">
+                    <div className="animate-fadeIn delay-1">
                       <p className="text-[10px] font-black text-bento-olive uppercase mb-1">🌿 Organic Treatment</p>
                       <p className="text-sm font-medium text-bento-dark">{record.organicTreatment}</p>
                     </div>
-                    <div>
+                    <div className="animate-fadeIn delay-2">
                       <p className="text-[10px] font-black text-bento-olive uppercase mb-1">⚗️ Chemical Treatment</p>
                       <p className="text-sm font-medium text-bento-dark">{record.chemicalTreatment}</p>
                     </div>
-                    <div>
+                    <div className="animate-fadeIn delay-3">
                       <p className="text-[10px] font-black text-bento-olive uppercase mb-1">🛡️ Prevention</p>
                       <p className="text-sm font-medium text-bento-dark">{record.prevention}</p>
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); deleteRecord(i); }}
-                      className="text-xs font-black text-bento-orange hover:text-red-700 transition-colors"
+                      className="text-xs font-black text-bento-orange hover:text-red-700 transition-colors hover:scale-105 active:scale-95 press"
                     >
                       🗑️ Delete Record
                     </button>

@@ -68,11 +68,11 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] flex flex-col">
+    <div className="max-w-3xl mx-auto px-4 py-6 h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] flex flex-col page-enter">
       {/* Header Card */}
-      <div className="bento-card bg-bento-warm p-4 mb-4 flex items-center justify-between">
+      <div className="bento-card bg-bento-warm p-4 mb-4 flex items-center justify-between animate-slideDown hover-lift">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-bento-lavender bento-border flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-bento-lavender bento-border flex items-center justify-center animate-float">
             <span className="text-lg">🧠</span>
           </div>
           <div>
@@ -80,18 +80,19 @@ export default function ChatPage() {
             <p className="text-xs font-bold text-bento-olive">Class 9 Innovation • Gemini 3.5 Flash</p>
           </div>
         </div>
-        <div className="bg-bento-lime bento-border rounded-xl px-2 py-1">
-          <span className="text-[10px] font-black text-bento-dark">24/7 AGRI ASSIST</span>
+        <div className="bg-bento-lime bento-border rounded-xl px-2 py-1 animate-pulse-soft">
+          <span className="text-[10px] font-black text-bento-dark">● 24/7 AGRI ASSIST</span>
         </div>
       </div>
 
       {/* Suggestion Chips */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-2">
-        {SUGGESTIONS.map((s) => (
+        {SUGGESTIONS.map((s, i) => (
           <button
             key={s}
             onClick={() => sendMessage(s.split(" ").slice(1).join(" "))}
-            className="flex-shrink-0 bg-white bento-border rounded-2xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime transition-colors"
+            className="flex-shrink-0 bg-white bento-border rounded-2xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all animate-fadeIn"
+            style={{ animationDelay: `${0.1 * (i + 1)}s` }}
           >
             {s}
           </button>
@@ -103,10 +104,10 @@ export default function ChatPage() {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex ${msg.sender === "USER" ? "justify-end" : "justify-start"}`}
+            className={`flex ${msg.sender === "USER" ? "justify-end" : "justify-start"} animate-fadeIn`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl p-3 ${
+              className={`max-w-[80%] rounded-2xl p-3 transition-transform hover:scale-[1.02] ${
                 msg.sender === "USER"
                   ? "bg-bento-dark text-white"
                   : "bg-white bento-border text-bento-dark"
@@ -114,7 +115,7 @@ export default function ChatPage() {
             >
               {msg.sender === "BOT" && (
                 <div className="flex items-center gap-1.5 mb-1">
-                  <div className="w-5 h-5 rounded-full bg-bento-lime bento-border flex items-center justify-center text-[10px]">
+                  <div className="w-5 h-5 rounded-full bg-bento-lime bento-border flex items-center justify-center text-[10px] animate-float">
                     🌱
                   </div>
                   <span className="text-[10px] font-black text-bento-olive">AgriSmart AI</span>
@@ -125,29 +126,33 @@ export default function ChatPage() {
           </div>
         ))}
         {loading && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 animate-fadeIn">
             <div className="w-8 h-8 rounded-full bg-bento-lime bento-border flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-bento-dark border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs">🌱</span>
             </div>
-            <span className="text-sm font-bold text-bento-olive">AgriSmart AI is thinking...</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-bento-olive loading-dot" />
+              <div className="w-2 h-2 rounded-full bg-bento-olive loading-dot" style={{ animationDelay: "0.2s" }} />
+              <div className="w-2 h-2 rounded-full bg-bento-olive loading-dot" style={{ animationDelay: "0.4s" }} />
+            </div>
           </div>
         )}
       </div>
 
       {/* Input Bar */}
-      <div className="bento-border bg-white p-2 flex gap-2 mt-2">
+      <div className="bento-border bg-white p-2 flex gap-2 mt-2 animate-slideUp hover-lift">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
           placeholder="Ask about crops, soil, pests, irrigation..."
-          className="flex-1 px-4 py-2 text-sm font-medium bg-bento-bg rounded-xl focus:outline-none"
+          className="flex-1 px-4 py-2 text-sm font-medium bg-bento-bg rounded-xl focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all"
         />
         <button
           onClick={() => sendMessage(input)}
           disabled={loading}
-          className="bg-bento-lime bento-border rounded-xl px-4 py-2 font-black text-sm text-bento-dark hover:opacity-80 transition-opacity disabled:opacity-50"
+          className="bg-bento-lime bento-border rounded-xl px-4 py-2 font-black text-sm text-bento-dark hover:scale-105 active:scale-95 transition-all disabled:opacity-50 press"
         >
           Send ➤
         </button>

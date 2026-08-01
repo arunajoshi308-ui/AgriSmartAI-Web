@@ -92,10 +92,10 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4 page-enter">
       {/* Header */}
-      <div className="bento-card bg-bento-peach p-4 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-bento-dark flex items-center justify-center">
+      <div className="bento-card bg-bento-peach p-4 flex items-center gap-3 animate-slideDown hover-lift">
+        <div className="w-10 h-10 rounded-full bg-bento-dark flex items-center justify-center animate-float">
           <span className="text-bento-peach text-lg">📷</span>
         </div>
         <div>
@@ -106,23 +106,23 @@ export default function ScannerPage() {
 
       {/* Upload Area */}
       <div
-        className="bento-card bg-white p-6 cursor-pointer hover:bg-bento-bg transition-colors"
+        className="bento-card bg-white p-6 cursor-pointer hover:bg-bento-bg hover-lift transition-all group animate-scaleIn"
         onClick={() => fileInputRef.current?.click()}
       >
         {selectedImage ? (
-          <div className="relative">
+          <div className="relative animate-fadeIn">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={selectedImage} alt="Selected leaf" className="w-full rounded-2xl max-h-72 object-cover bento-border" />
+            <img src={selectedImage} alt="Selected leaf" className="w-full rounded-2xl max-h-72 object-cover bento-border transition-transform group-hover:scale-[1.02]" />
             <button
               onClick={(e) => { e.stopPropagation(); setSelectedImage(null); setDiagnosis(null); }}
-              className="absolute top-2 right-2 bg-bento-dark text-white rounded-full w-8 h-8 flex items-center justify-center font-black"
+              className="absolute top-2 right-2 bg-bento-dark text-white rounded-full w-8 h-8 flex items-center justify-center font-black hover:scale-110 active:scale-90 transition-transform"
             >
               ✕
             </button>
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className="text-5xl mb-3">🌿</div>
+            <div className="text-5xl mb-3 animate-float">🌿</div>
             <p className="font-black text-bento-dark text-base">Tap to upload a leaf photo</p>
             <p className="text-sm font-bold text-bento-olive mt-1">
               Camera or gallery • JPG/PNG supported
@@ -140,18 +140,19 @@ export default function ScannerPage() {
       </div>
 
       {/* Crop Selector */}
-      <div className="bento-card bg-bento-warm p-4">
+      <div className="bento-card bg-bento-warm p-4 animate-fadeIn delay-2 hover-lift">
         <p className="text-sm font-black text-bento-dark mb-3">Select Crop Category:</p>
         <div className="flex flex-wrap gap-2">
-          {CROPS.map((crop) => (
+          {CROPS.map((crop, i) => (
             <button
               key={crop}
               onClick={() => setCropHint(crop)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all hover:scale-105 active:scale-95 animate-bounceIn ${
                 cropHint === crop
                   ? "bg-bento-dark text-white"
                   : "bg-white bento-border text-bento-dark hover:bg-bento-lime"
               }`}
+              style={{ animationDelay: `${0.05 * (i + 1)}s` }}
             >
               {crop}
             </button>
@@ -163,7 +164,7 @@ export default function ScannerPage() {
       <button
         onClick={analyzeImage}
         disabled={!selectedImage || loading}
-        className="w-full bg-bento-lime bento-border rounded-2xl py-3.5 font-black text-sm text-bento-dark hover:opacity-80 transition-opacity disabled:opacity-50"
+        className="w-full bg-bento-lime bento-border rounded-2xl py-3.5 font-black text-sm text-bento-dark hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 press animate-fadeIn delay-3 hover-glow"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -177,15 +178,15 @@ export default function ScannerPage() {
 
       {/* Diagnosis Results */}
       {diagnosis && (
-        <div className="space-y-4 animate-fadeIn">
+        <div className="space-y-4">
           {/* Main Result Card */}
-          <div className="bento-card bg-white p-5">
+          <div className="bento-card bg-white p-5 animate-bounceIn hover-lift">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="font-black text-bento-dark text-lg">{diagnosis.diseaseName}</h3>
                 <p className="text-xs font-bold text-bento-olive">{diagnosis.cropName} • Crop Analysis</p>
               </div>
-              <span className={`px-3 py-1 rounded-xl text-[10px] font-black ${statusColors[diagnosis.healthStatus] || statusColors.WARNING}`}>
+              <span className={`px-3 py-1 rounded-xl text-[10px] font-black animate-pop ${statusColors[diagnosis.healthStatus] || statusColors.WARNING}`}>
                 {diagnosis.healthStatus}
               </span>
             </div>
@@ -196,9 +197,9 @@ export default function ScannerPage() {
                 <span className="text-xs font-bold text-bento-olive">AI Confidence</span>
                 <span className="text-xs font-black text-bento-dark">{diagnosis.confidence}%</span>
               </div>
-              <div className="w-full bg-bento-warm rounded-full h-2.5 bento-border">
+              <div className="w-full bg-bento-warm rounded-full h-2.5 bento-border overflow-hidden">
                 <div
-                  className="bg-bento-lime h-full rounded-full"
+                  className="bg-gradient-to-r from-bento-lime to-bento-olive h-full rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${diagnosis.confidence}%` }}
                 />
               </div>
@@ -206,40 +207,40 @@ export default function ScannerPage() {
           </div>
 
           {/* Symptoms */}
-          <div className="bento-card bg-bento-peach p-4">
+          <div className="bento-card bg-bento-peach p-4 animate-slideUp delay-1 hover-lift">
             <h4 className="font-black text-bento-dark text-sm mb-1.5">🔍 Symptoms</h4>
             <p className="text-sm font-medium text-bento-olive">{diagnosis.symptoms}</p>
           </div>
 
           {/* Organic Treatment */}
-          <div className="bento-card bg-bento-lime p-4">
+          <div className="bento-card bg-bento-lime p-4 animate-slideUp delay-2 hover-lift">
             <h4 className="font-black text-bento-dark text-sm mb-1.5">🌿 Organic Treatment</h4>
             <p className="text-sm font-medium text-bento-dark">{diagnosis.organicTreatment}</p>
           </div>
 
           {/* Chemical Treatment */}
-          <div className="bento-card bg-bento-skyblue p-4">
+          <div className="bento-card bg-bento-skyblue p-4 animate-slideUp delay-3 hover-lift">
             <h4 className="font-black text-bento-dark text-sm mb-1.5">⚗️ Chemical Treatment</h4>
             <p className="text-sm font-medium text-bento-dark">{diagnosis.chemicalTreatment}</p>
           </div>
 
           {/* Prevention */}
-          <div className="bento-card bg-bento-lavender p-4">
+          <div className="bento-card bg-bento-lavender p-4 animate-slideUp delay-4 hover-lift">
             <h4 className="font-black text-bento-dark text-sm mb-1.5">🛡️ Prevention</h4>
             <p className="text-sm font-medium text-bento-dark">{diagnosis.prevention}</p>
           </div>
 
-          {/* Save Button */}
-          <div className="flex gap-3">
+          {/* Save Buttons */}
+          <div className="flex gap-3 animate-fadeIn delay-5">
             <button
               onClick={saveToHistory}
-              className="flex-1 bg-bento-dark text-white font-black text-sm py-3 rounded-2xl hover:opacity-90 transition-opacity"
+              className="flex-1 bg-bento-dark text-white font-black text-sm py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all press"
             >
               {saved ? "✅ Saved to History" : "💾 Save to History"}
             </button>
             <Link
               href="/history"
-              className="flex-1 bg-white bento-border text-bento-dark font-black text-sm py-3 rounded-2xl text-center hover:bg-bento-lime transition-colors"
+              className="flex-1 bg-white bento-border text-bento-dark font-black text-sm py-3 rounded-2xl text-center hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all"
             >
               📋 View History
             </Link>
