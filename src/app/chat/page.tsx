@@ -52,14 +52,14 @@ export default function ChatPage() {
               <p className="text-[10px] md:text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>Gemini 3.5 Flash • Class 9 Innovation</p>
             </div>
           </div>
-          <div className="bg-bento-lime bento-border rounded-xl px-2 py-1 flex-shrink-0">
+          <div className="bg-bento-lime bento-border rounded-xl px-2 py-1 flex-shrink-0 animate-gentle-bounce">
             <span className="text-[9px] md:text-[10px] font-black text-bento-dark">● 24/7</span>
           </div>
         </div>
       </div>
 
       {/* Suggestions */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-2">
         {SUGGESTIONS.map((s, i) => (
           <button key={s} onClick={() => sendMessage(s.split(" ").slice(1).join(" "))} className="flex-shrink-0 bg-white bento-border rounded-xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all animate-fadeIn mobile-touch" style={{ animationDelay: `${0.08 * (i + 1)}s` }}>{s}</button>
         ))}

@@ -50,11 +50,11 @@ export default function HistoryPage() {
 
       {/* Empty State */}
       {history.length === 0 ? (
-        <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp" style={{ height: 260 }}>
+        <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp" style={{ height: 240 }}>
           <ProximityHover shape="star" fill="solid" particleColor="#D1E67C" backgroundColor="#1C1C16" maxSize={20} minSize={3} gap={8} influence={180} autoPulse />
           <div className="absolute inset-0 bg-bento-dark/35 pointer-events-none" />
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4">
-            <div className="text-4xl md:text-5xl mb-3 animate-float">🌱</div>
+            <div className="text-4xl md:text-5xl mb-3 animate-float-sway">🌱</div>
             <h3 className="font-black text-bento-lime text-base md:text-lg mb-1" style={{ textShadow: "0 2px 12px rgba(28,28,22,0.95)" }}>No Scans Yet</h3>
             <p className="text-xs md:text-sm font-bold text-white/70 mb-3 md:mb-4" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.85)" }}>Start scanning plant leaves to build your history</p>
             <a href="/scanner" className="pointer-events-auto inline-block bg-bento-lime bento-border rounded-2xl px-5 md:px-6 py-2.5 md:py-3 font-black text-xs md:text-sm text-bento-dark hover:scale-105 active:scale-95 transition-all press hover-lift mobile-touch">📷 Open Scanner</a>
@@ -63,7 +63,7 @@ export default function HistoryPage() {
       ) : (
         <div className="space-y-2.5 md:space-y-3">
           {history.map((record, i) => (
-            <div key={i} className="bento-card bg-white overflow-hidden hover-lift animate-fadeUp" style={{ animationDelay: `${0.05 * (i + 1)}s` }}>
+            <div key={i} className="bento-card bg-white overflow-hidden hover-lift animate-fadeUp relative" style={{ animationDelay: `${0.05 * (i + 1)}s` }}>
               <div className="p-3 md:p-4 cursor-pointer transition-all hover:bg-bento-bg/50" onClick={() => setExpanded(expanded === i ? null : i)}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2.5 md:gap-3 min-w-0">

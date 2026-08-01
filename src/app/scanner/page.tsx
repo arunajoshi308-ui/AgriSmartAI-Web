@@ -66,14 +66,15 @@ export default function ScannerPage() {
               <p className="text-[10px] md:text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>AI Plant Disease Detection • Gemini Vision</p>
             </div>
           </div>
-          <div className="bg-bento-lime bento-border rounded-xl px-2 py-1 flex-shrink-0">
+          <div className="bg-bento-lime bento-border rounded-xl px-2 py-1 flex-shrink-0 animate-gentle-bounce">
             <span className="text-[9px] md:text-[10px] font-black text-bento-dark">● AI VISION</span>
           </div>
         </div>
       </div>
 
       {/* Upload */}
-      <div className="bento-card bg-white p-4 md:p-6 cursor-pointer hover:bg-bento-bg hover-lift transition-all group animate-fadeUp" onClick={() => fileInputRef.current?.click()}>
+      <div className="bento-card bg-white p-4 md:p-6 cursor-pointer hover:bg-bento-bg hover-lift transition-all group animate-fadeUp relative overflow-hidden" onClick={() => fileInputRef.current?.click()}>
+        <div className="absolute -bottom-2 -right-2 text-4xl opacity-10 animate-float-sway select-none">🌿</div>
         {selectedImage ? (
           <div className="relative animate-fadeIn">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -81,8 +82,8 @@ export default function ScannerPage() {
             <button onClick={(e) => { e.stopPropagation(); setSelectedImage(null); setDiagnosis(null); }} className="absolute top-2 right-2 bg-bento-dark text-white rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center font-black hover:scale-110 active:scale-90 transition-transform press">✕</button>
           </div>
         ) : (
-          <div className="text-center py-6 md:py-8">
-            <div className="text-4xl md:text-5xl mb-2 md:mb-3 animate-float">🌿</div>
+          <div className="text-center py-6 md:py-8 relative z-10">
+            <div className="text-4xl md:text-5xl mb-2 md:mb-3 animate-float-sway">🌿</div>
             <p className="font-black text-bento-dark text-sm md:text-base">Tap to upload a leaf photo</p>
             <p className="text-xs md:text-sm font-bold text-bento-olive mt-1">Camera or gallery • JPG/PNG supported</p>
           </div>
@@ -91,9 +92,10 @@ export default function ScannerPage() {
       </div>
 
       {/* Crop Selector */}
-      <div className="bento-card bg-bento-warm p-3 md:p-4 animate-fadeUp delay-2 hover-lift">
-        <p className="text-xs md:text-sm font-black text-bento-dark mb-2 md:mb-3">Select Crop Category:</p>
-        <div className="flex flex-wrap gap-1.5 md:gap-2">
+      <div className="bento-card bg-bento-warm p-3 md:p-4 animate-fadeUp delay-2 hover-lift relative overflow-hidden">
+        <div className="absolute -top-2 -right-2 text-3xl opacity-10 animate-sway select-none">🌾</div>
+        <p className="text-xs md:text-sm font-black text-bento-dark mb-2 md:mb-3 relative z-10">Select Crop Category:</p>
+        <div className="flex flex-wrap gap-1.5 md:gap-2 relative z-10">
           {CROPS.map((crop) => (
             <button key={crop} onClick={() => setCropHint(crop)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${cropHint === crop ? "bg-bento-dark text-white animate-pop" : "bg-white bento-border text-bento-dark hover:bg-bento-lime"}`}>{crop}</button>
           ))}
@@ -101,7 +103,7 @@ export default function ScannerPage() {
       </div>
 
       {/* Analyze */}
-      <button onClick={(e) => { ripple(e); analyzeImage(); }} disabled={!selectedImage || loading} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 press animate-fadeUp delay-3 hover-lift ripple-container overflow-hidden relative mobile-touch">
+      <button onClick={(e) => { ripple(e); analyzeImage(); }} disabled={!selectedImage || loading} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 press animate-fadeUp delay-3 hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep">
         {loading ? (
           <span className="flex items-center justify-center gap-2"><div className="w-5 h-5 border-2 border-bento-dark border-t-transparent rounded-full animate-spin" />Analyzing leaf...</span>
         ) : "🔬 ANALYZE WITH AI"}
@@ -114,15 +116,16 @@ export default function ScannerPage() {
             <div style={{ height: 40 }}>
               <ProximityHover shape="hexagon" fill="solid" particleColor={diagnosis.healthStatus === "HEALTHY" ? "#D1E67C" : diagnosis.healthStatus === "DISEASED" ? "#FF6B6B" : "#FFE0B2"} backgroundColor="#1C1C16" maxSize={16} minSize={2} gap={8} influence={140} autoPulse />
             </div>
-            <div className="bg-white p-4 md:p-5">
-              <div className="flex items-center justify-between mb-2 md:mb-3">
+            <div className="bg-white p-4 md:p-5 relative overflow-hidden">
+              <div className="absolute -top-2 -right-2 text-3xl opacity-10 animate-float-sway select-none">🔬</div>
+              <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
                 <div>
                   <h3 className="font-black text-bento-dark text-base md:text-lg">{diagnosis.diseaseName}</h3>
                   <p className="text-xs font-bold text-bento-olive">{diagnosis.cropName} • Crop Analysis</p>
                 </div>
                 <span className={`px-2.5 md:px-3 py-1 rounded-xl text-[10px] font-black animate-pop ${statusColors[diagnosis.healthStatus] || statusColors.WARNING}`}>{diagnosis.healthStatus}</span>
               </div>
-              <div>
+              <div className="relative z-10">
                 <div className="flex justify-between mb-1"><span className="text-xs font-bold text-bento-olive">AI Confidence</span><span className="text-xs font-black text-bento-dark">{diagnosis.confidence}%</span></div>
                 <div className="w-full bg-bento-warm rounded-full h-2.5 bento-border overflow-hidden">
                   <div className="bg-gradient-to-r from-bento-lime to-bento-olive h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${diagnosis.confidence}%` }} />
@@ -132,14 +135,15 @@ export default function ScannerPage() {
           </div>
 
           {[
-            { title: "🔍 Symptoms", content: diagnosis.symptoms, color: "bg-bento-peach", delay: "delay-1" },
-            { title: "🌿 Organic Treatment", content: diagnosis.organicTreatment, color: "bg-bento-lime", delay: "delay-2" },
-            { title: "⚗️ Chemical Treatment", content: diagnosis.chemicalTreatment, color: "bg-bento-skyblue", delay: "delay-3" },
-            { title: "🛡️ Prevention", content: diagnosis.prevention, color: "bg-bento-lavender", delay: "delay-4" },
+            { title: "🔍 Symptoms", content: diagnosis.symptoms, color: "bg-bento-peach", delay: "delay-1", emoji: "🔍" },
+            { title: "🌿 Organic Treatment", content: diagnosis.organicTreatment, color: "bg-bento-lime", delay: "delay-2", emoji: "🌿" },
+            { title: "⚗️ Chemical Treatment", content: diagnosis.chemicalTreatment, color: "bg-bento-skyblue", delay: "delay-3", emoji: "⚗️" },
+            { title: "🛡️ Prevention", content: diagnosis.prevention, color: "bg-bento-lavender", delay: "delay-4", emoji: "🛡️" },
           ].map((card) => (
-            <div key={card.title} className={`bento-card ${card.color} p-3 md:p-4 animate-fadeUp ${card.delay} hover-lift`}>
-              <h4 className="font-black text-bento-dark text-xs md:text-sm mb-1.5">{card.title}</h4>
-              <p className="text-xs md:text-sm font-medium text-bento-dark leading-relaxed">{card.content}</p>
+            <div key={card.title} className={`bento-card ${card.color} p-3 md:p-4 animate-fadeUp ${card.delay} hover-lift relative overflow-hidden`}>
+              <div className="absolute -bottom-1 -right-1 text-3xl opacity-10 animate-float-sway select-none">{card.emoji}</div>
+              <h4 className="font-black text-bento-dark text-xs md:text-sm mb-1.5 relative z-10">{card.title}</h4>
+              <p className="text-xs md:text-sm font-medium text-bento-dark leading-relaxed relative z-10">{card.content}</p>
             </div>
           ))}
 

@@ -68,8 +68,8 @@ export default function Home() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6 page-enter pb-24 md:pb-6">
-      {/* ===== HERO — responsive height ===== */}
-      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeDown mobile-hero md:!h-[440px]" style={{ height: 360 }}>
+      {/* ===== HERO ===== */}
+      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeDown" style={{ height: 360 }}>
         <ProximityHover
           shape="hexagon"
           fill="stroke"
@@ -86,7 +86,7 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-bento-dark/40 via-transparent to-bento-dark/50 pointer-events-none" />
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-6">
-          <span className="bg-bento-lime text-bento-dark text-[9px] md:text-[10px] font-black px-3 md:px-4 py-1.5 rounded-full mb-3 md:mb-4 pointer-events-auto border-2 border-bento-dark animate-fadeUp delay-2">
+          <span className="bg-bento-lime text-bento-dark text-[9px] md:text-[10px] font-black px-3 md:px-4 py-1.5 rounded-full mb-3 md:mb-4 pointer-events-auto border-2 border-bento-dark animate-fadeUp delay-2 animate-gentle-bounce">
             ● AI ACTIVE • CLASS 9
           </span>
           <div className="hero-title-wrap">
@@ -105,7 +105,7 @@ export default function Home() {
           </p>
           <Link
             href="/chat"
-            className="mt-4 md:mt-5 pointer-events-auto ripple-container inline-flex items-center justify-center gap-2 bg-bento-lime text-bento-dark font-black text-xs md:text-sm px-6 md:px-7 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all animate-fadeUp delay-5 hover-lift border-2 border-bento-dark mobile-touch"
+            className="mt-4 md:mt-5 pointer-events-auto ripple-container inline-flex items-center justify-center gap-2 bg-bento-lime text-bento-dark font-black text-xs md:text-sm px-6 md:px-7 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all animate-fadeUp delay-5 hover-lift border-2 border-bento-dark mobile-touch shimmer-sweep"
           >
             💬 START CHATTING WITH AI
           </Link>
@@ -147,7 +147,7 @@ export default function Home() {
         className={`relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark ${visibleSections.has("stats") ? "animate-fadeUp" : "opacity-0"}`}
         data-reveal
         id="stats"
-        style={{ height: 140 }}
+        style={{ height: 130 }}
       >
         <ProximityHover
           shape="circle"
@@ -177,17 +177,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== DIVIDER ===== */}
-      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp" style={{ height: 64 }}>
-        <ProximityHover shape="star" fill="stroke" strokeWidth={1.5} particleColor="#D1E67C" backgroundColor="#1C1C16" maxSize={26} minSize={4} gap={8} influence={160} rotateOnHover autoPulse />
-        <div className="absolute inset-0 bg-bento-dark/30 pointer-events-none" />
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <p className="text-bento-lime font-black text-xs md:text-sm tracking-widest animate-text-glow">
-            ⚡ POWERED BY GEMINI 3.5 FLASH ⚡
-          </p>
-        </div>
-      </div>
-
       {/* ===== ABOUT ===== */}
       <div
         className={`bento-card bg-bento-warm p-4 md:p-7 hover-lift overflow-hidden ${visibleSections.has("about") ? "animate-fadeUp" : "opacity-0"}`}
@@ -195,6 +184,8 @@ export default function Home() {
         id="about"
       >
         <div className="absolute top-4 right-4 w-8 md:w-10 h-8 md:h-10 rounded-full border-2 border-bento-dark/10 animate-spin-slow" />
+        {/* Decorative emoji */}
+        <div className="absolute -bottom-3 -right-3 text-5xl opacity-10 animate-float-sway select-none">🌱</div>
         <h2 className="font-black text-bento-dark text-base md:text-lg mb-2 md:mb-3 relative z-10">🌱 About AgriSmart AI</h2>
         <p className="text-xs md:text-sm font-medium text-bento-olive leading-relaxed relative z-10">
           AgriSmart AI is an AI-powered agricultural assistant created by Class 9 Student Innovators.
@@ -219,7 +210,7 @@ export default function Home() {
         className={`relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark hover-lift ${visibleSections.has("team") ? "animate-fadeUp" : "opacity-0"}`}
         data-reveal
         id="team"
-        style={{ minHeight: 320 }}
+        style={{ minHeight: 300 }}
       >
         <div className="absolute inset-0">
           <ProximityHover shape="rounded" fill="solid" particleColor="#D1E67C" gradientColor="#5D621E" backgroundColor="#1C1C16" maxSize={24} minSize={3} gap={8} influence={220} autoPulse />
@@ -261,54 +252,40 @@ export default function Home() {
 
       {/* ===== FEEDBACK ===== */}
       <div
-        className={`relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark ${visibleSections.has("feedback") ? "animate-fadeUp" : "opacity-0"}`}
+        className={`bento-card bg-white p-4 md:p-7 ${visibleSections.has("feedback") ? "animate-fadeUp" : "opacity-0"}`}
         data-reveal
         id="feedback"
       >
-        <div style={{ height: 36 }}>
-          <ProximityHover shape="triangle" fill="stroke" strokeWidth={1.5} particleColor="#5D621E" backgroundColor="#D1E67C" maxSize={16} minSize={2} gap={6} influence={100} rotateOnHover />
+        {/* Decorative emoji */}
+        <div className="absolute -top-2 -right-2 text-4xl opacity-10 animate-sway select-none">📝</div>
+        <h2 className="font-black text-bento-dark text-base md:text-lg mb-2">📝 Student Feedback</h2>
+        <p className="text-xs md:text-sm font-bold text-bento-olive mb-3 md:mb-4">
+          We&apos;d love to hear from you! Rate AgriSmart AI and share your thoughts.
+        </p>
+        <div className="flex gap-2 mb-3 md:mb-4">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              onClick={() => setRating(star)}
+              className={`text-2xl md:text-3xl transition-all hover:scale-125 active:scale-90 mobile-touch ${star <= rating ? "animate-pop" : "grayscale opacity-40"}`}
+            >
+              ⭐
+            </button>
+          ))}
         </div>
-        <div className="bg-white p-4 md:p-7">
-          <h2 className="font-black text-bento-dark text-base md:text-lg mb-2">📝 Student Feedback</h2>
-          <p className="text-xs md:text-sm font-bold text-bento-olive mb-3 md:mb-4">
-            We&apos;d love to hear from you! Rate AgriSmart AI and share your thoughts.
-          </p>
-          <div className="flex gap-2 mb-3 md:mb-4">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setRating(star)}
-                className={`text-2xl md:text-3xl transition-all hover:scale-125 active:scale-90 mobile-touch ${star <= rating ? "animate-pop" : "grayscale opacity-40"}`}
-              >
-                ⭐
-              </button>
-            ))}
-          </div>
-          <textarea
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            placeholder="Share your feedback..."
-            className="w-full bento-border rounded-2xl p-3 md:p-4 text-sm font-medium resize-none focus:outline-none focus:ring-2 focus:ring-bento-lime bg-bento-bg transition-all"
-            rows={3}
-          />
-          <button
-            onClick={(e) => { ripple(e); handleFeedbackSubmit(); }}
-            className="mt-3 bg-bento-dark text-white font-black text-xs md:text-sm px-5 md:px-6 py-3 rounded-2xl hover:opacity-90 hover:scale-105 active:scale-95 transition-all press ripple-container overflow-hidden relative mobile-touch"
-          >
-            {submitted ? "✅ Thank you for your feedback!" : "Submit Feedback"}
-          </button>
-        </div>
-      </div>
-
-      {/* ===== FOOTER ===== */}
-      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp" style={{ height: 56 }}>
-        <ProximityHover shape="diamond" fill="solid" particleColor="#D1E67C" backgroundColor="#1C1C16" maxSize={14} minSize={2} gap={8} influence={140} autoPulse />
-        <div className="absolute inset-0 bg-bento-dark/30 pointer-events-none" />
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <p className="text-bento-lime font-black text-[10px] md:text-xs tracking-wider animate-text-glow">
-            🌾 AgriSmart AI • Class 9 Innovators 🌾
-          </p>
-        </div>
+        <textarea
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          placeholder="Share your feedback..."
+          className="w-full bento-border rounded-2xl p-3 md:p-4 text-sm font-medium resize-none focus:outline-none focus:ring-2 focus:ring-bento-lime bg-bento-bg transition-all"
+          rows={3}
+        />
+        <button
+          onClick={(e) => { ripple(e); handleFeedbackSubmit(); }}
+          className="mt-3 bg-bento-dark text-white font-black text-xs md:text-sm px-5 md:px-6 py-3 rounded-2xl hover:opacity-90 hover:scale-105 active:scale-95 transition-all press ripple-container overflow-hidden relative mobile-touch"
+        >
+          {submitted ? "✅ Thank you for your feedback!" : "Submit Feedback"}
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import FloatingEmojis from "@/components/FloatingEmojis";
 
 export const metadata: Metadata = {
   title: "AgriSmart AI — Crop Yield Optimizer & Plant Disease Detector",
@@ -22,9 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <FloatingEmojis count={12} />
         <Navbar />
-        <main className="min-h-screen pb-20">{children}</main>
-        <footer className="border-t-2 border-bento-dark bg-bento-dark text-bento-bg px-6 py-8 text-center">
+        <main className="min-h-screen pb-20 relative" style={{ zIndex: 1 }}>{children}</main>
+        <footer className="border-t-2 border-bento-dark bg-bento-dark text-bento-bg px-6 py-8 text-center relative" style={{ zIndex: 1 }}>
           <p className="text-sm font-bold">
             AgriSmart AI 🌾 — Built by Class 9 Student Innovators
           </p>
