@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { useState } from "react";
 
+const TEAM = [
+  { name: "Shourya", emoji: "🌾", color: "bg-bento-lime" },
+  { name: "Pranav J", emoji: "🔬", color: "bg-bento-peach" },
+  { name: "Pratyush", emoji: "📊", color: "bg-bento-lavender" },
+  { name: "Pranav K", emoji: "🤖", color: "bg-bento-skyblue" },
+  { name: "Rohan", emoji: "🌱", color: "bg-bento-warm" },
+  { name: "Krutik", emoji: "💧", color: "bg-bento-lime" },
+];
+
 export default function Home() {
   const [feedback, setFeedback] = useState("");
   const [rating, setRating] = useState(5);
@@ -118,6 +127,33 @@ export default function Home() {
           <span className="bg-bento-peach bento-border rounded-xl px-3 py-1.5 text-xs font-black text-bento-dark">Disease Detection</span>
           <span className="bg-bento-lavender bento-border rounded-xl px-3 py-1.5 text-xs font-black text-bento-dark">Yield Forecasting</span>
           <span className="bg-bento-skyblue bento-border rounded-xl px-3 py-1.5 text-xs font-black text-bento-dark">Soil Analysis</span>
+        </div>
+      </div>
+
+      {/* Team Section */}
+      <div className="bento-card bg-bento-dark p-5 md:p-7">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">👥</span>
+          <h2 className="font-black text-bento-lime text-lg">Meet the Team</h2>
+        </div>
+        <p className="text-sm font-bold text-bento-bg/70 mb-4">
+          Class 9 Student Innovators behind AgriSmart AI
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {TEAM.map((member) => (
+            <div
+              key={member.name}
+              className="flex items-center gap-3 bg-bento-bg/10 border-2 border-bento-bg/20 rounded-2xl p-3 hover:border-bento-lime transition-colors"
+            >
+              <div className={`w-11 h-11 rounded-full ${member.color} bento-border flex items-center justify-center text-lg flex-shrink-0`}>
+                {member.emoji}
+              </div>
+              <div>
+                <p className="font-black text-bento-bg text-sm">{member.name}</p>
+                <p className="text-[10px] font-bold text-bento-lime">Student Innovator</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
