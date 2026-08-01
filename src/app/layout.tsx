@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import FloatingEmojis from "@/components/FloatingEmojis";
 import ScrollProgress from "@/components/ScrollProgress";
+import AnimatedBackground from "@/components/AnimatedBackground";
 
 export const metadata: Metadata = {
   title: "AgriSmart AI — Crop Yield Optimizer & Plant Disease Detector",
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ScrollProgress />
+        <AnimatedBackground />
         <FloatingEmojis count={12} />
         <Navbar />
         <main className="min-h-screen pb-20 relative" style={{ zIndex: 1 }}>{children}</main>
@@ -33,7 +35,7 @@ export default function RootLayout({
             AgriSmart AI 🌾 — Built by Class 9 Student Innovators
           </p>
           <p className="text-xs mt-2 text-bento-lime font-bold">
-            Shourya • Pranav J • Pratyush • Pranav K • Rohan • Krutik • Myank • Nikunj
+            Shourya • Pranav J • Pratyush • Pranav K • Rohan • Myank • Nikunj
           </p>
           <p className="text-xs mt-2 text-bento-bg/60">
             Powered by Gemini 3.5 Flash • Open Source on GitHub

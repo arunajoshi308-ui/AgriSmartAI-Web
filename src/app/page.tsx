@@ -13,7 +13,6 @@ const TEAM = [
   { name: "Pratyush", emoji: "📊", color: "bg-bento-lavender" },
   { name: "Pranav K", emoji: "🤖", color: "bg-bento-skyblue" },
   { name: "Rohan", emoji: "🌱", color: "bg-bento-warm" },
-  { name: "Krutik", emoji: "💧", color: "bg-bento-lime" },
   { name: "Myank", emoji: "🧪", color: "bg-bento-peach" },
   { name: "Nikunj", emoji: "🦋", color: "bg-bento-lavender" },
 ];
@@ -22,7 +21,7 @@ const STATS = [
   { value: 99, suffix: "%", label: "AI Accuracy", icon: "🎯" },
   { value: 8, suffix: "+", label: "Crop Types", icon: "🌾" },
   { value: 24, suffix: "/7", label: "AI Assist", icon: "🤖" },
-  { value: 8, suffix: "", label: "Innovators", icon: "👥" },
+  { value: 7, suffix: "", label: "Innovators", icon: "👥" },
 ];
 
 const FEATURES = [
@@ -38,7 +37,6 @@ const MARQUEE_ITEMS = [
   "🧪 Soil Analysis", "🌿 Class 9 Innovators",
 ];
 
-// Directional entrance animations for cards — alternating left/right/up
 const ENTRANCE = ["animate-fadeUp", "animate-fadeLeft", "animate-fadeUp", "animate-fadeRight"];
 
 function StatTile({ stat, index }: { stat: typeof STATS[0]; index: number }) {
@@ -98,7 +96,7 @@ export default function Home() {
             <h1 className="text-2xl md:text-5xl font-black text-white text-center leading-tight animate-fadeUp delay-3" style={{ textShadow: "0 4px 24px rgba(28,28,22,0.95), 0 2px 4px rgba(28,28,22,0.85)" }}>AgriSmart AI 🌾</h1>
           </div>
           <p className="text-bento-lime font-bold text-xs md:text-lg mt-2 md:mt-3 text-center animate-fadeUp delay-4" style={{ textShadow: "0 2px 8px rgba(28,28,22,0.9)" }}>Move your cursor across the grid ✨</p>
-          <Link href="/chat" className="mt-4 md:mt-5 pointer-events-auto ripple-container inline-flex items-center justify-center gap-2 bg-bento-lime text-bento-dark font-black text-xs md:text-sm px-6 md:px-7 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all animate-fadeUp delay-5 hover-lift border-2 border-bento-dark mobile-touch shimmer-sweep">💬 START CHATTING WITH AI</Link>
+          <Link href="/chat" className="mt-4 md:mt-5 pointer-events-auto ripple-container inline-flex items-center justify-center gap-2 bg-bento-lime text-bento-dark font-black text-xs md:text-sm px-6 md:px-7 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all animate-fadeUp delay-5 hover-lift border-2 border-bento-dark mobile-touch shimmer-sweep" style={{ transitionTimingFunction: "var(--ease-spring)" }}>💬 START CHATTING WITH AI</Link>
         </div>
       </div>
 
@@ -111,14 +109,14 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== FEATURE GRID — staggered directional entrance ===== */}
+      {/* ===== FEATURE GRID ===== */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {FEATURES.map((feat, i) => (
           <Link
             key={feat.href}
             href={feat.href}
             className={`bento-card ${feat.color} p-4 md:p-5 hover-lift press group relative overflow-hidden ${ENTRANCE[i % ENTRANCE.length]}`}
-            style={{ animationDelay: `${0.1 * (i + 1)}s` }}
+            style={{ animationDelay: `${0.1 * (i + 1)}s`, transitionTimingFunction: "var(--ease)" }}
           >
             <div className="absolute -top-8 -right-8 w-16 md:w-20 h-16 md:h-20 rounded-full border-2 border-bento-dark/8 animate-spin-slow" />
             <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-bento-dark flex items-center justify-center mb-2 md:mb-3 transition-transform group-hover:animate-wiggle relative z-10">
@@ -130,7 +128,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* ===== STATS with count-up ===== */}
+      {/* ===== STATS ===== */}
       <div
         className={`relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark ${visibleSections.has("stats") ? "animate-fadeUp" : "opacity-0"}`}
         data-reveal id="stats" style={{ height: 130 }}
@@ -142,7 +140,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== ABOUT — slide from left ===== */}
+      {/* ===== ABOUT ===== */}
       <div
         className={`bento-card bg-bento-warm p-4 md:p-7 hover-lift overflow-hidden ${visibleSections.has("about") ? "reveal-left visible" : "reveal-left"}`}
         data-reveal id="about"
@@ -162,10 +160,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== TEAM — staggered grid reveal ===== */}
+      {/* ===== TEAM ===== */}
       <div
         className={`relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark hover-lift ${visibleSections.has("team") ? "reveal-scale visible" : "reveal-scale"}`}
-        data-reveal id="team" style={{ minHeight: 300 }}
+        data-reveal id="team" style={{ minHeight: 280 }}
       >
         <div className="absolute inset-0">
           <ProximityHover shape="rounded" fill="solid" particleColor="#D1E67C" gradientColor="#5D621E" backgroundColor="#1C1C16" maxSize={24} minSize={3} gap={8} influence={220} autoPulse />
@@ -179,7 +177,7 @@ export default function Home() {
           <p className="text-xs md:text-sm font-bold text-white/80 mb-3 md:mb-4" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.85)" }}>Class 9 Student Innovators behind AgriSmart AI</p>
           <div className={`grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 ${visibleSections.has("team") ? "stagger visible" : "stagger"}`}>
             {TEAM.map((member) => (
-              <div key={member.name} className="flex items-center gap-2 md:gap-3 bg-white/15 backdrop-blur-md border-2 border-bento-lime/40 rounded-2xl p-2.5 md:p-3 hover:border-bento-lime hover:bg-white/25 transition-all hover-lift">
+              <div key={member.name} className="flex items-center gap-2 md:gap-3 bg-white/15 backdrop-blur-md border-2 border-bento-lime/40 rounded-2xl p-2.5 md:p-3 hover:border-bento-lime hover:bg-white/25 transition-all hover-lift" style={{ transitionTimingFunction: "var(--ease)" }}>
                 <div className={`${member.color} w-9 h-9 md:w-11 md:h-11 rounded-full border-2 border-bento-dark flex items-center justify-center text-base md:text-lg flex-shrink-0`}>{member.emoji}</div>
                 <div className="min-w-0">
                   <p className="font-black text-white text-xs md:text-sm truncate drop-shadow">{member.name}</p>
@@ -191,7 +189,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== FEEDBACK — slide from right ===== */}
+      {/* ===== FEEDBACK ===== */}
       <div
         className={`bento-card bg-white p-4 md:p-7 ${visibleSections.has("feedback") ? "reveal-right visible" : "reveal-right"}`}
         data-reveal id="feedback"
@@ -205,7 +203,7 @@ export default function Home() {
           ))}
         </div>
         <textarea value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Share your feedback..." className="w-full bento-border rounded-2xl p-3 md:p-4 text-sm font-medium resize-none focus:outline-none focus:ring-2 focus:ring-bento-lime bg-bento-bg transition-all" rows={3} />
-        <button onClick={handleFeedbackSubmit} className="mt-3 bg-bento-dark text-white font-black text-xs md:text-sm px-5 md:px-6 py-3 rounded-2xl hover:opacity-90 hover:scale-105 active:scale-95 transition-all press ripple-container overflow-hidden relative mobile-touch">
+        <button onClick={handleFeedbackSubmit} className="mt-3 bg-bento-dark text-white font-black text-xs md:text-sm px-5 md:px-6 py-3 rounded-2xl hover:opacity-90 hover:scale-105 active:scale-95 transition-all press ripple-container overflow-hidden relative mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>
           {submitted ? "🎉 Thank you for your feedback!" : "Submit Feedback"}
         </button>
       </div>
