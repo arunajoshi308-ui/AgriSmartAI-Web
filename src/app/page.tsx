@@ -14,7 +14,7 @@ const TEAM = [
   { name: "Pratyush", emoji: "📊", color: "bg-bento-lavender" },
   { name: "Pranav K", emoji: "🤖", color: "bg-bento-skyblue" },
   { name: "Rohan", emoji: "🌱", color: "bg-bento-warm" },
-  { name: "Myank", emoji: "🧪", color: "bg-bento-peach" },
+  { name: "Mayank", emoji: "🧪", color: "bg-bento-peach" },
   { name: "Nikunj", emoji: "🦋", color: "bg-bento-lavender" },
 ];
 
