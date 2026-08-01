@@ -163,16 +163,9 @@ export default function YieldPage() {
 
         {/* MULTI-CROP SELECTOR */}
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-xs md:text-sm font-black text-bento-dark heading-underline">
-              🌾 Select Crops <span className="text-bento-olive">({selectedCrops.length} selected)</span>
-            </label>
-            {!showCustom ? (
-              <button onClick={() => setShowCustom(true)} className="text-[10px] font-black text-bento-olive hover:text-bento-dark press flex items-center gap-1">✏️ Add Custom</button>
-            ) : (
-              <button onClick={() => { setShowCustom(false); setCustomCrop(""); }} className="text-[10px] font-black text-bento-olive hover:text-bento-dark press">← Back to list</button>
-            )}
-          </div>
+          <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block heading-underline">
+            🌾 Select Crops <span className="text-bento-olive">({selectedCrops.length} selected)</span>
+          </label>
 
           {/* Selected crops summary */}
           {selectedCrops.length > 0 && (
@@ -186,7 +179,7 @@ export default function YieldPage() {
             </div>
           )}
 
-          {/* Crop options — multi-select toggle */}
+          {/* Crop options — multi-select toggle + inline Custom button */}
           {!showCustom ? (
             <div className="flex flex-wrap gap-1.5 md:gap-2">
               {CROPS.map((crop) => {
@@ -203,6 +196,13 @@ export default function YieldPage() {
                   </button>
                 );
               })}
+              <button
+                onClick={() => setShowCustom(true)}
+                className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1"
+                style={{ transitionTimingFunction: "var(--ease-spring)" }}
+              >
+                ✏️ Custom
+              </button>
             </div>
           ) : (
             <div className="flex gap-2 animate-fadeIn">
@@ -222,6 +222,13 @@ export default function YieldPage() {
                 style={{ transitionTimingFunction: "var(--ease-spring)" }}
               >
                 + Add
+              </button>
+              <button
+                onClick={() => { setShowCustom(false); setCustomCrop(""); }}
+                className="bg-bento-warm bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press mobile-touch"
+                style={{ transitionTimingFunction: "var(--ease-spring)" }}
+              >
+                ← Back
               </button>
             </div>
           )}
