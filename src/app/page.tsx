@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import ProximityHover from "@/components/ProximityHover";
 
 const TEAM = [
   { name: "Shourya", emoji: "🌾", color: "bg-bento-lime" },
@@ -11,7 +12,7 @@ const TEAM = [
   { name: "Rohan", emoji: "🌱", color: "bg-bento-warm" },
   { name: "Krutik", emoji: "💧", color: "bg-bento-lime" },
   { name: "Myank", emoji: "🧪", color: "bg-bento-peach" },
-  { name: "Nikunj", emoji: "昆虫", color: "bg-bento-lavender" },
+  { name: "Nikunj", emoji: "🦋", color: "bg-bento-lavender" },
 ];
 
 const STATS = [
@@ -42,7 +43,6 @@ export default function Home() {
     }
   };
 
-  // Scroll reveal
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -60,32 +60,37 @@ export default function Home() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 space-y-5 page-enter">
-      {/* Hero Bento Tile */}
-      <div
-        className="bento-card bg-bento-lime p-5 md:p-7 shadow-sm animate-slideDown hover-lift"
-        data-reveal
-        id="hero"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <span className="bg-bento-dark text-white text-[10px] font-black px-3 py-1 rounded-full animate-pulse-soft">
+      {/* ===== REACTIVE GRID HERO ===== */}
+      <div className="relative rounded-[28px] overflow-hidden border-2 border-bento-dark animate-slideDown" style={{ height: "380px" }}>
+        <ProximityHover
+          shape="hexagon"
+          fill="stroke"
+          strokeWidth={2}
+          particleColor="#D1E67C"
+          backgroundColor="#1C1C16"
+          maxSize={40}
+          minSize={8}
+          gap={6}
+          influence={280}
+        />
+        {/* Overlay content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="bg-bento-lime text-bento-dark text-[10px] font-black px-4 py-1.5 rounded-full mb-3 animate-pulse-soft pointer-events-auto">
             ● AI ACTIVE • CLASS 9
           </span>
-          <div className="w-9 h-9 rounded-full bg-bento-dark flex items-center justify-center animate-float">
-            <span className="text-bento-lime text-lg">🤖</span>
-          </div>
+          <h1 className="text-3xl md:text-5xl font-black text-white text-center leading-tight animate-fadeIn delay-2 drop-shadow-lg">
+            AgriSmart AI 🌾
+          </h1>
+          <p className="text-bento-lime font-bold text-sm md:text-lg mt-2 text-center animate-fadeIn delay-3 drop-shadow">
+            Move your cursor across the grid ✨
+          </p>
+          <Link
+            href="/chat"
+            className="mt-4 pointer-events-auto inline-flex items-center justify-center gap-2 bg-bento-lime text-bento-dark font-black text-sm px-7 py-3 rounded-2xl hover:scale-110 active:scale-95 transition-all animate-fadeIn delay-4 hover-glow border-2 border-bento-dark"
+          >
+            💬 START CHATTING WITH AI
+          </Link>
         </div>
-        <h1 className="text-2xl md:text-4xl font-black text-bento-dark leading-tight animate-fadeIn delay-2">
-          Need to optimize<br />your crop yield?
-        </h1>
-        <p className="text-bento-olive font-bold text-sm md:text-lg mt-1 animate-fadeIn delay-3">
-          Ask our Gemini 3.5 AI for real-time agronomy advisory &amp; soil pH analysis
-        </p>
-        <Link
-          href="/chat"
-          className="mt-4 w-full md:w-auto inline-flex items-center justify-center gap-2 bg-bento-dark text-white font-black text-sm px-6 py-3 rounded-2xl hover:opacity-90 transition-all hover:scale-105 press animate-fadeIn delay-4"
-        >
-          💬 START CHATTING WITH AI
-        </Link>
       </div>
 
       {/* Feature Grid */}
@@ -114,7 +119,7 @@ export default function Home() {
             className={`bento-card ${stat.color} p-4 text-center hover-pop animate-flipIn`}
             style={{ animationDelay: `${0.1 * (i + 1)}s` }}
           >
-            <div className="text-xl mb-1">{stat.icon}</div>
+            <div className="text-xl mb-1 animate-float" style={{ animationDelay: `${0.3 * (i + 1)}s` }}>{stat.icon}</div>
             <p className="text-2xl md:text-3xl font-black text-bento-dark">{stat.value}</p>
             <p className="text-[10px] font-bold text-bento-olive uppercase mt-1">{stat.label}</p>
           </div>
@@ -137,10 +142,10 @@ export default function Home() {
           {["Gemini 3.5 Flash", "Disease Detection", "Yield Forecasting", "Soil Analysis"].map((tag, i) => (
             <span
               key={tag}
-              className={`bento-border rounded-xl px-3 py-1.5 text-xs font-black text-bento-dark animate-bounceIn hover-pop`}
+              className="bento-border rounded-xl px-3 py-1.5 text-xs font-black text-bento-dark animate-bounceIn hover-pop"
               style={{
                 animationDelay: `${0.1 * (i + 1)}s`,
-                background: ["bg-bento-lime", "bg-bento-peach", "bg-bento-lavender", "bg-bento-skyblue"][i],
+                background: ["#D1E67C", "#FFE0B2", "#D7C5F0", "#B3E0FF"][i],
               }}
             >
               {tag}
@@ -149,35 +154,53 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Team Section — FIXED VISIBILITY */}
+      {/* Team Section — Dark with Reactive Grid BG */}
       <div
-        className={`bento-card bg-gradient-to-br from-bento-dark via-[#2a2a20] to-bento-dark p-5 md:p-7 hover-lift ${visibleSections.has("team") ? "animate-slideUp" : "opacity-0"}`}
+        className="relative rounded-[28px] overflow-hidden border-2 border-bento-dark hover-lift"
+        style={{ height: "auto", minHeight: "300px" }}
         data-reveal
         id="team"
       >
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-2xl animate-float">👥</span>
-          <h2 className="font-black text-bento-lime text-xl">Meet the Team</h2>
+        {/* Reactive grid background */}
+        <div className="absolute inset-0">
+          <ProximityHover
+            shape="rounded"
+            fill="solid"
+            strokeWidth={1}
+            particleColor="#D1E67C"
+            backgroundColor="#1C1C16"
+            maxSize={24}
+            minSize={4}
+            gap={8}
+            influence={200}
+          />
         </div>
-        <p className="text-sm font-bold text-bento-lime/80 mb-4">
-          Class 9 Student Innovators behind AgriSmart AI
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {TEAM.map((member, i) => (
-            <div
-              key={member.name}
-              className="flex items-center gap-3 bg-white/10 backdrop-blur-sm border-2 border-bento-lime/30 rounded-2xl p-3 hover:border-bento-lime hover:bg-white/20 transition-all hover-lift animate-scaleIn group"
-              style={{ animationDelay: `${0.08 * (i + 1)}s` }}
-            >
-              <div className={`${member.color} w-11 h-11 rounded-full border-2 border-bento-dark flex items-center justify-center text-lg flex-shrink-0 transition-transform group-hover:animate-wiggle`}>
-                {member.emoji}
+        {/* Team content overlay */}
+        <div className="relative z-10 p-5 md:p-7">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl animate-float">👥</span>
+            <h2 className="font-black text-bento-lime text-xl drop-shadow-lg">Meet the Team</h2>
+          </div>
+          <p className="text-sm font-bold text-bento-lime/80 mb-4 drop-shadow">
+            Class 9 Student Innovators behind AgriSmart AI
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {TEAM.map((member, i) => (
+              <div
+                key={member.name}
+                className="flex items-center gap-3 bg-white/15 backdrop-blur-md border-2 border-bento-lime/40 rounded-2xl p-3 hover:border-bento-lime hover:bg-white/25 transition-all hover-lift animate-scaleIn group"
+                style={{ animationDelay: `${0.08 * (i + 1)}s` }}
+              >
+                <div className={`${member.color} w-11 h-11 rounded-full border-2 border-bento-dark flex items-center justify-center text-lg flex-shrink-0 transition-transform group-hover:animate-wiggle`}>
+                  {member.emoji}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black text-white text-sm truncate drop-shadow">{member.name}</p>
+                  <p className="text-[10px] font-bold text-bento-lime">Student Innovator</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="font-black text-white text-sm truncate">{member.name}</p>
-                <p className="text-[10px] font-bold text-bento-lime">Student Innovator</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
