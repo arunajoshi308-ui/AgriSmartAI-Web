@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ProximityHover from "@/components/ProximityHover";
 import { useRipple } from "@/hooks/useAnimations";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const CROPS = ["Wheat", "Rice", "Maize", "Tomato", "Cotton", "Soybean", "Sugarcane", "Potato", "Onion", "Groundnut", "Mustard", "Sunflower", "Pulses", "Banana"];
 const SOIL_TYPES = ["Alluvial / Loam", "Black Soil", "Clay Soil", "Sandy Soil", "Red Soil", "Peaty Soil"];
@@ -36,11 +37,7 @@ const recommendations = [
   "Deploy AgriSmart AI Disease Scanner weekly for early leaf rust protection.",
 ];
 
-interface SelectorGroup {
-  label: string;
-  key: string;
-  options: string[];
-}
+interface SelectorGroup { label: string; key: string; options: string[]; }
 
 const SELECTOR_GROUPS: SelectorGroup[] = [
   { label: "🌾 Crop Type", key: "crop", options: CROPS },
@@ -48,6 +45,65 @@ const SELECTOR_GROUPS: SelectorGroup[] = [
   { label: "💧 Irrigation", key: "irrigation", options: IRRIGATION },
   { label: "🌱 Seed Quality", key: "seed", options: SEED_QUALITY },
 ];
+
+function YieldResult({ result }: { result: any }) {
+  const yieldCount = useCountUp(result.estimatedYieldTons, 800);
+  const revCount = useCountUp(result.estimatedRevenueUSD, 1000);
+
+  return (
+    <div className="space-y-3 animate-slide-up">
+      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp">
+        <div style={{ height: 36 }}>
+          <ProximityHover shape="hexagon" fill="solid" particleColor="#D1E67C" backgroundColor="#1C1C16" maxSize={16} minSize={2} gap={8} influence={140} autoPulse />
+        </div>
+        <div className="bg-bento-lime p-4 md:p-5 relative overflow-hidden">
+          <div className="absolute -top-2 -right-2 text-4xl opacity-10 animate-sway select-none">💰</div>
+          <div className="grid grid-cols-2 gap-3 md:gap-4 relative z-10">
+            <div className="animate-fadeIn delay-1" ref={yieldCount.ref}>
+              <p className="text-[10px] font-black text-bento-olive uppercase">Estimated Yield</p>
+              <p className="text-xl md:text-2xl font-black text-bento-dark">{yieldCount.value} tons</p>
+            </div>
+            <div className="animate-fadeIn delay-2" ref={revCount.ref}>
+              <p className="text-[10px] font-black text-bento-olive uppercase">Est. Revenue</p>
+              <p className="text-xl md:text-2xl font-black text-bento-dark">${revCount.value.toLocaleString()}</p>
+            </div>
+          </div>
+          <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t-2 border-bento-dark/20 animate-fadeIn delay-3 relative z-10">
+            <p className="text-[10px] font-black text-bento-olive uppercase">Crop</p>
+            <p className="text-xs md:text-sm font-black text-bento-dark">{result.crop} • {result.acres} acres</p>
+            {result.isCustom && (
+              <p className="text-[9px] font-bold text-bento-olive mt-1">💡 Estimated values for custom crop — AI used sensible defaults</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp delay-2">
+        <div style={{ height: 32 }}>
+          <ProximityHover shape="star" fill="stroke" strokeWidth={1.5} particleColor="#5D621E" backgroundColor="#D7C5F0" maxSize={16} minSize={2} gap={6} influence={120} rotateOnHover />
+        </div>
+        <div className="bg-bento-lavender p-3 md:p-4 relative overflow-hidden hover-lift">
+          <div className="absolute -bottom-1 -right-1 text-3xl opacity-10 animate-float-sway select-none">🧪</div>
+          <h4 className="font-black text-bento-dark text-xs md:text-sm mb-2 relative z-10 heading-underline">🧪 Recommended NPK Ratio</h4>
+          <p className="text-sm md:text-lg font-black text-bento-dark animate-fadeIn delay-1 relative z-10">{result.npkRatio}</p>
+        </div>
+      </div>
+
+      <div className="bento-card bg-white p-4 md:p-5 animate-fadeUp delay-3 hover-lift hover-glow relative overflow-hidden border-trace">
+        <div className="absolute -bottom-2 -right-2 text-4xl opacity-10 animate-sway select-none">📋</div>
+        <h4 className="font-black text-bento-dark text-xs md:text-sm mb-3 relative z-10 heading-underline">📋 AI Recommendations</h4>
+        <ul className="space-y-2 relative z-10">
+          {result.recommendations.map((rec: string, i: number) => (
+            <li key={i} className="flex items-start gap-2 animate-fadeIn" style={{ animationDelay: `${0.08 * (i + 1)}s` }}>
+              <span className="text-bento-lime bg-bento-dark rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black flex-shrink-0 mt-0.5 animate-pop">{i + 1}</span>
+              <span className="text-xs md:text-sm font-medium text-bento-dark leading-relaxed">{rec}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 export default function YieldPage() {
   const [crop, setCrop] = useState("Wheat");
@@ -64,7 +120,6 @@ export default function YieldPage() {
     crop: [crop, setCrop], soil: [soilType, setSoilType], irrigation: [irrigation, setIrrigation], seed: [seedQuality, setSeedQuality],
   };
 
-  // Get effective value (custom or preset)
   const getEffectiveValue = (key: string): string => {
     if (customMode[key] && customInputs[key]?.trim()) return customInputs[key].trim();
     return stateMap[key][0];
@@ -76,12 +131,11 @@ export default function YieldPage() {
     const effIrr = getEffectiveValue("irrigation");
     const effSeed = getEffectiveValue("seed");
 
-    // Use known values or sensible defaults for custom entries
-    const baseYield = baseYieldPerAcre[effCrop] || 3.0; // default 3 tons/acre for unknown crops
-    const soilMult = soilMultiplier[effSoil] || 1.0;    // default neutral for custom soil
+    const baseYield = baseYieldPerAcre[effCrop] || 3.0;
+    const soilMult = soilMultiplier[effSoil] || 1.0;
     const irrMult = irrigationMultiplier[effIrr] || 1.0;
     const seedMult = seedMultiplier[effSeed] || 1.0;
-    const price = pricePerTon[effCrop] || 400; // default $400/ton for unknown crops
+    const price = pricePerTon[effCrop] || 400;
     const npk = npkRatios[effCrop] || "100 : 50 : 50 (NPK kg/ha) — Estimated for custom crop";
 
     const totalTons = acres * baseYield * soilMult * irrMult * seedMult;
@@ -103,49 +157,22 @@ export default function YieldPage() {
     return (
       <div key={group.key} className="animate-fadeIn relative z-10" style={{ animationDelay: `${0.08 * (gi + 1)}s` }}>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs md:text-sm font-black text-bento-dark">{group.label}</label>
+          <label className="text-xs md:text-sm font-black text-bento-dark heading-underline">{group.label}</label>
           {isCustom && (
-            <button
-              onClick={() => setCustomMode({ ...customMode, [group.key]: false })}
-              className="text-[10px] font-black text-bento-olive hover:text-bento-dark press"
-            >
-              ← Back to list
-            </button>
+            <button onClick={() => setCustomMode({ ...customMode, [group.key]: false })} className="text-[10px] font-black text-bento-olive hover:text-bento-dark press">← Back to list</button>
           )}
         </div>
         {!isCustom ? (
           <div className="flex flex-wrap gap-1.5 md:gap-2">
             {group.options.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => setter(opt)}
-                className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${current === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}
-              >
-                {opt}
-              </button>
+              <button key={opt} onClick={() => setter(opt)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press ${current === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`} style={{ transitionTimingFunction: "var(--ease-spring)" }}>{opt}</button>
             ))}
-            <button
-              onClick={() => setCustomMode({ ...customMode, [group.key]: true })}
-              className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1"
-            >
-              ✏️ Custom
-            </button>
+            <button onClick={() => setCustomMode({ ...customMode, [group.key]: true })} className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1" style={{ transitionTimingFunction: "var(--ease-spring)" }}>✏️ Custom</button>
           </div>
         ) : (
           <div className="animate-fadeIn">
-            <input
-              type="text"
-              value={customVal}
-              onChange={(e) => setCustomInputs({ ...customInputs, [group.key]: e.target.value })}
-              placeholder={`Type custom ${group.label.split(" ").slice(1).join(" ").toLowerCase()}...`}
-              className="w-full bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all"
-              autoFocus
-            />
-            {customVal.trim() && (
-              <p className="text-[10px] font-black text-bento-olive mt-1.5">
-                ✅ Custom: <span className="text-bento-dark">{customVal.trim()}</span>
-              </p>
-            )}
+            <input type="text" value={customVal} onChange={(e) => setCustomInputs({ ...customInputs, [group.key]: e.target.value })} placeholder={`Type custom ${group.label.split(" ").slice(1).join(" ").toLowerCase()}...`} className="w-full bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all" autoFocus />
+            {customVal.trim() && <p className="text-[10px] font-black text-bento-olive mt-1.5">✅ Custom: <span className="text-bento-dark">{customVal.trim()}</span></p>}
           </div>
         )}
       </div>
@@ -160,7 +187,7 @@ export default function YieldPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-bento-dark/45 via-transparent to-bento-dark/35 pointer-events-none" />
         <div className="absolute inset-0 flex items-center justify-between px-4 md:px-5">
           <div className="flex items-center gap-2.5 md:gap-3">
-            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-bento-skyblue bento-border flex items-center justify-center animate-float text-base md:text-lg flex-shrink-0">📊</div>
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-bento-skyblue bento-border flex items-center justify-center animate-float text-base md:text-lg flex-shrink-0 hover-icon">📊</div>
             <div>
               <h2 className="font-black text-bento-skyblue text-sm md:text-base" style={{ textShadow: "0 2px 8px rgba(28,28,22,0.9)" }}>Yield Optimizer</h2>
               <p className="text-[10px] md:text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>Crop yield calculator & revenue forecast</p>
@@ -170,7 +197,7 @@ export default function YieldPage() {
       </div>
 
       {/* Form */}
-      <div className="bento-card bg-white p-4 md:p-5 space-y-3 md:space-y-4 animate-fadeUp hover-lift relative overflow-hidden">
+      <div className="bento-card bg-white p-4 md:p-5 space-y-3 md:space-y-4 animate-fadeUp hover-lift relative overflow-hidden border-trace">
         <div className="absolute -bottom-2 -right-2 text-4xl opacity-10 animate-float-sway select-none">📈</div>
         {SELECTOR_GROUPS.map((group, gi) => renderSelector(group, gi))}
         <div className="animate-fadeIn delay-5 relative z-10">
@@ -178,65 +205,13 @@ export default function YieldPage() {
           <input type="range" min="0.5" max="50" step="0.5" value={acres} onChange={(e) => setAcres(parseFloat(e.target.value))} className="w-full accent-bento-olive transition-all" />
           <div className="flex justify-between text-[10px] font-bold text-bento-olive"><span>0.5 acre</span><span>50 acres</span></div>
         </div>
-        <button onClick={(e) => { ripple(e); calculate(); }} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all press hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep relative z-10">
+        <button onClick={(e) => { ripple(e); calculate(); }} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark btn-anim btn-glow-trail hover:scale-[1.01] active:scale-95 transition-all press hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep relative z-10" style={{ transitionTimingFunction: "var(--ease-spring)" }}>
           📊 CALCULATE YIELD & REVENUE
         </button>
       </div>
 
       {/* Results */}
-      {result && (
-        <div className="space-y-3">
-          <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp">
-            <div style={{ height: 36 }}>
-              <ProximityHover shape="hexagon" fill="solid" particleColor="#D1E67C" backgroundColor="#1C1C16" maxSize={16} minSize={2} gap={8} influence={140} autoPulse />
-            </div>
-            <div className="bg-bento-lime p-4 md:p-5 relative overflow-hidden">
-              <div className="absolute -top-2 -right-2 text-4xl opacity-10 animate-sway select-none">💰</div>
-              <div className="grid grid-cols-2 gap-3 md:gap-4 relative z-10">
-                <div className="animate-fadeIn delay-1">
-                  <p className="text-[10px] font-black text-bento-olive uppercase">Estimated Yield</p>
-                  <p className="text-xl md:text-2xl font-black text-bento-dark">{result.estimatedYieldTons} tons</p>
-                </div>
-                <div className="animate-fadeIn delay-2">
-                  <p className="text-[10px] font-black text-bento-olive uppercase">Est. Revenue</p>
-                  <p className="text-xl md:text-2xl font-black text-bento-dark">${result.estimatedRevenueUSD.toLocaleString()}</p>
-                </div>
-              </div>
-              <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t-2 border-bento-dark/20 animate-fadeIn delay-3 relative z-10">
-                <p className="text-[10px] font-black text-bento-olive uppercase">Crop</p>
-                <p className="text-xs md:text-sm font-black text-bento-dark">{result.crop} • {result.acres} acres</p>
-                {result.isCustom && (
-                  <p className="text-[9px] font-bold text-bento-olive mt-1">💡 Estimated values for custom crop — AI used sensible defaults</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp delay-2">
-            <div style={{ height: 32 }}>
-              <ProximityHover shape="star" fill="stroke" strokeWidth={1.5} particleColor="#5D621E" backgroundColor="#D7C5F0" maxSize={16} minSize={2} gap={6} influence={120} rotateOnHover />
-            </div>
-            <div className="bg-bento-lavender p-3 md:p-4 relative overflow-hidden">
-              <div className="absolute -bottom-1 -right-1 text-3xl opacity-10 animate-float-sway select-none">🧪</div>
-              <h4 className="font-black text-bento-dark text-xs md:text-sm mb-2 relative z-10">🧪 Recommended NPK Ratio</h4>
-              <p className="text-sm md:text-lg font-black text-bento-dark animate-fadeIn delay-1 relative z-10">{result.npkRatio}</p>
-            </div>
-          </div>
-
-          <div className="bento-card bg-white p-4 md:p-5 animate-fadeUp delay-3 hover-lift relative overflow-hidden">
-            <div className="absolute -bottom-2 -right-2 text-4xl opacity-10 animate-sway select-none">📋</div>
-            <h4 className="font-black text-bento-dark text-xs md:text-sm mb-3 relative z-10">📋 AI Recommendations</h4>
-            <ul className="space-y-2 relative z-10">
-              {result.recommendations.map((rec: string, i: number) => (
-                <li key={i} className="flex items-start gap-2 animate-fadeIn" style={{ animationDelay: `${0.08 * (i + 1)}s` }}>
-                  <span className="text-bento-lime bg-bento-dark rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black flex-shrink-0 mt-0.5">{i + 1}</span>
-                  <span className="text-xs md:text-sm font-medium text-bento-dark leading-relaxed">{rec}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+      {result && <YieldResult result={result} />}
     </div>
   );
 }

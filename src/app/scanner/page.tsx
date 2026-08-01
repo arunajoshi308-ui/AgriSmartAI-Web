@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import ProximityHover from "@/components/ProximityHover";
 import { useRipple } from "@/hooks/useAnimations";
+import { useTilt } from "@/hooks/useInteractions";
 
 interface Diagnosis {
   cropName: string; diseaseName: string; healthStatus: string; confidence: number;
@@ -29,6 +30,7 @@ export default function ScannerPage() {
   const [saved, setSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ripple = useRipple();
+  const uploadTilt = useTilt<HTMLDivElement>(4);
 
   const activeCrop = showCustom && customCrop.trim() ? customCrop.trim() : cropHint;
 
@@ -80,18 +82,18 @@ export default function ScannerPage() {
         </div>
       </div>
 
-      {/* Upload */}
-      <div className="bento-card bg-white p-4 md:p-6 cursor-pointer hover:bg-bento-bg hover-lift transition-all group animate-fadeUp relative overflow-hidden" onClick={() => fileInputRef.current?.click()}>
+      {/* Upload — 3D tilt */}
+      <div ref={uploadTilt} className="bento-card bg-white p-4 md:p-6 cursor-pointer hover:bg-bento-bg hover-lift transition-all group animate-fadeUp relative overflow-hidden border-trace" onClick={() => fileInputRef.current?.click()} style={{ transformStyle: "preserve-3d", transition: "transform 0.3s var(--ease), background 0.3s ease" }}>
         <div className="absolute -bottom-2 -right-2 text-4xl opacity-10 animate-float-sway select-none">🌿</div>
         {selectedImage ? (
           <div className="relative animate-fadeIn">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={selectedImage} alt="Selected leaf" className="w-full rounded-2xl max-h-64 md:max-h-72 object-cover bento-border transition-transform group-hover:scale-[1.02]" />
-            <button onClick={(e) => { e.stopPropagation(); setSelectedImage(null); setDiagnosis(null); }} className="absolute top-2 right-2 bg-bento-dark text-white rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center font-black hover:scale-110 active:scale-90 transition-transform press">✕</button>
+            <button onClick={(e) => { e.stopPropagation(); setSelectedImage(null); setDiagnosis(null); }} className="absolute top-2 right-2 bg-bento-dark text-white rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center font-black hover:scale-110 active:scale-90 transition-transform press" style={{ transitionTimingFunction: "var(--ease-spring)" }}>✕</button>
           </div>
         ) : (
           <div className="text-center py-6 md:py-8 relative z-10">
-            <div className="text-4xl md:text-5xl mb-2 md:mb-3 animate-float-sway">🌿</div>
+            <div className="text-4xl md:text-5xl mb-2 md:mb-3 animate-float-sway hover-icon">🌿</div>
             <p className="font-black text-bento-dark text-sm md:text-base">Tap to upload a leaf photo</p>
             <p className="text-xs md:text-sm font-bold text-bento-olive mt-1">Camera or gallery • JPG/PNG supported</p>
           </div>
@@ -103,7 +105,7 @@ export default function ScannerPage() {
       <div className="bento-card bg-bento-warm p-3 md:p-4 animate-fadeUp delay-2 hover-lift relative overflow-hidden">
         <div className="absolute -top-2 -right-2 text-3xl opacity-10 animate-sway select-none">🌾</div>
         <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
-          <p className="text-xs md:text-sm font-black text-bento-dark">Select Crop Category:</p>
+          <p className="text-xs md:text-sm font-black text-bento-dark heading-underline">Select Crop Category:</p>
           {showCustom && (
             <button onClick={() => { setShowCustom(false); setCustomCrop(""); }} className="text-[10px] font-black text-bento-olive hover:text-bento-dark press">← Back to list</button>
           )}
@@ -111,9 +113,9 @@ export default function ScannerPage() {
         {!showCustom ? (
           <div className="flex flex-wrap gap-1.5 md:gap-2 relative z-10">
             {CROPS.map((crop) => (
-              <button key={crop} onClick={() => setCropHint(crop)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${cropHint === crop ? "bg-bento-dark text-white animate-pop" : "bg-white bento-border text-bento-dark hover:bg-bento-lime"}`}>{crop}</button>
+              <button key={crop} onClick={() => setCropHint(crop)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press ${cropHint === crop ? "bg-bento-dark text-white animate-pop" : "bg-white bento-border text-bento-dark hover:bg-bento-lime"}`} style={{ transitionTimingFunction: "var(--ease-spring)" }}>{crop}</button>
             ))}
-            <button onClick={() => setShowCustom(true)} className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1">
+            <button onClick={() => setShowCustom(true)} className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1" style={{ transitionTimingFunction: "var(--ease-spring)" }}>
               ✏️ Custom
             </button>
           </div>
@@ -134,8 +136,8 @@ export default function ScannerPage() {
         )}
       </div>
 
-      {/* Analyze */}
-      <button onClick={(e) => { ripple(e); analyzeImage(); }} disabled={!selectedImage || loading || (showCustom && !customCrop.trim())} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 press animate-fadeUp delay-3 hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep">
+      {/* Analyze — button with glow trail */}
+      <button onClick={(e) => { ripple(e); analyzeImage(); }} disabled={!selectedImage || loading || (showCustom && !customCrop.trim())} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark btn-anim btn-glow-trail transition-all disabled:opacity-50 press animate-fadeUp delay-3 hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep" style={{ transitionTimingFunction: "var(--ease-spring)" }}>
         {loading ? (
           <span className="flex items-center justify-center gap-2"><div className="w-5 h-5 border-2 border-bento-dark border-t-transparent rounded-full animate-spin" />Analyzing leaf...</span>
         ) : "🔬 ANALYZE WITH AI"}
@@ -143,7 +145,7 @@ export default function ScannerPage() {
 
       {/* Results */}
       {diagnosis && (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-slide-up">
           <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp">
             <div style={{ height: 40 }}>
               <ProximityHover shape="hexagon" fill="solid" particleColor={diagnosis.healthStatus === "HEALTHY" ? "#D1E67C" : diagnosis.healthStatus === "DISEASED" ? "#FF6B6B" : "#FFE0B2"} backgroundColor="#1C1C16" maxSize={16} minSize={2} gap={8} influence={140} autoPulse />
@@ -152,7 +154,7 @@ export default function ScannerPage() {
               <div className="absolute -top-2 -right-2 text-3xl opacity-10 animate-float-sway select-none">🔬</div>
               <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
                 <div>
-                  <h3 className="font-black text-bento-dark text-base md:text-lg">{diagnosis.diseaseName}</h3>
+                  <h3 className="font-black text-bento-dark text-base md:text-lg heading-underline">{diagnosis.diseaseName}</h3>
                   <p className="text-xs font-bold text-bento-olive">{diagnosis.cropName} • Crop Analysis</p>
                 </div>
                 <span className={`px-2.5 md:px-3 py-1 rounded-xl text-[10px] font-black animate-pop ${statusColors[diagnosis.healthStatus] || statusColors.WARNING}`}>{diagnosis.healthStatus}</span>
@@ -172,7 +174,7 @@ export default function ScannerPage() {
             { title: "⚗️ Chemical Treatment", content: diagnosis.chemicalTreatment, color: "bg-bento-skyblue", delay: "delay-3", emoji: "⚗️" },
             { title: "🛡️ Prevention", content: diagnosis.prevention, color: "bg-bento-lavender", delay: "delay-4", emoji: "🛡️" },
           ].map((card) => (
-            <div key={card.title} className={`bento-card ${card.color} p-3 md:p-4 animate-fadeUp ${card.delay} hover-lift relative overflow-hidden`}>
+            <div key={card.title} className={`bento-card ${card.color} p-3 md:p-4 animate-fadeUp ${card.delay} hover-lift hover-glow relative overflow-hidden border-trace`} style={{ transitionTimingFunction: "var(--ease)" }}>
               <div className="absolute -bottom-1 -right-1 text-3xl opacity-10 animate-float-sway select-none">{card.emoji}</div>
               <h4 className="font-black text-bento-dark text-xs md:text-sm mb-1.5 relative z-10">{card.title}</h4>
               <p className="text-xs md:text-sm font-medium text-bento-dark leading-relaxed relative z-10">{card.content}</p>
@@ -180,8 +182,8 @@ export default function ScannerPage() {
           ))}
 
           <div className="flex gap-2 md:gap-3 animate-fadeUp delay-5">
-            <button onClick={(e) => { ripple(e); saveToHistory(); }} className="flex-1 bg-bento-dark text-white font-black text-xs md:text-sm py-2.5 md:py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all press ripple-container overflow-hidden relative mobile-touch">{saved ? "✅ Saved" : "💾 Save"}</button>
-            <Link href="/history" className="flex-1 bg-white bento-border text-bento-dark font-black text-xs md:text-sm py-2.5 md:py-3 rounded-2xl text-center hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all mobile-touch">📋 History</Link>
+            <button onClick={(e) => { ripple(e); saveToHistory(); }} className="flex-1 bg-bento-dark text-white font-black text-xs md:text-sm py-2.5 md:py-3 rounded-2xl btn-anim btn-glow-trail hover:opacity-90 active:scale-95 transition-all press ripple-container overflow-hidden relative mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>{saved ? "✅ Saved" : "💾 Save"}</button>
+            <Link href="/history" className="flex-1 bg-white bento-border text-bento-dark font-black text-xs md:text-sm py-2.5 md:py-3 rounded-2xl text-center hover:bg-bento-lime btn-anim active:scale-95 transition-all mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>📋 History</Link>
           </div>
         </div>
       )}

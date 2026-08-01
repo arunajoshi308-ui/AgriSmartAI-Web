@@ -80,10 +80,35 @@ body {
   100% { transform: translateY(-110vh) rotate(180deg); opacity: 0; }
 }
 
-/* Card border subtle pulse */
-@keyframes borderPulse {
-  0%, 100% { border-color: var(--bento-dark); }
-  50% { border-color: rgba(93, 98, 30, 0.4); }
+/* New keyframes */
+@keyframes underlineGrow { from { width: 0; } to { width: 100%; } }
+@keyframes buttonGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(209, 230, 124, 0); }
+  50% { box-shadow: 0 0 20px rgba(209, 230, 124, 0.4); }
+}
+@keyframes clickBurst {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px) scale(1.1); }
+}
+@keyframes borderTrace {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.95; }
+}
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleXIn {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
 }
 
 /* ===== ANIMATION CLASSES ===== */
@@ -104,6 +129,9 @@ body {
 .animate-sway { animation: sway 3s ease-in-out infinite; }
 .animate-gentle-bounce { animation: gentleBounce 2.5s ease-in-out infinite; }
 .animate-slide-down { animation: slideDownReveal 0.35s var(--ease) both; }
+.animate-breathe { animation: breathe 4s ease-in-out infinite; }
+.animate-icon-bounce { animation: iconBounce 2s ease-in-out infinite; }
+.animate-button-glow { animation: buttonGlow 2.5s ease-in-out infinite; }
 
 .delay-1 { animation-delay: 0.08s; }
 .delay-2 { animation-delay: 0.16s; }
@@ -113,6 +141,32 @@ body {
 .delay-6 { animation-delay: 0.48s; }
 .delay-7 { animation-delay: 0.56s; }
 .delay-8 { animation-delay: 0.64s; }
+
+/* ===== BUTTON ANIMATIONS ===== */
+.btn-anim {
+  position: relative; overflow: hidden;
+  transition: transform 0.25s var(--ease-spring), box-shadow 0.3s ease;
+}
+@media (hover: hover) {
+  .btn-anim:hover { transform: scale(1.04); box-shadow: 0 8px 20px rgba(28, 28, 22, 0.15); }
+}
+.btn-anim:active { transform: scale(0.95); }
+
+/* Button inner glow trail */
+.btn-glow-trail::before {
+  content: ""; position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s var(--ease);
+}
+@media (hover: hover) {
+  .btn-glow-trail:hover::before { left: 120%; }
+}
+
+/* CTA pulse — draws attention to primary actions */
+.btn-cta {
+  animation: buttonGlow 3s ease-in-out infinite;
+}
 
 /* ===== HOVER / INTERACTION ===== */
 .hover-lift { transition: transform 0.35s var(--ease), box-shadow 0.35s ease, border-color 0.35s ease; }
@@ -124,13 +178,16 @@ body {
 .hover-glow { transition: box-shadow 0.3s ease; }
 .hover-glow:hover { box-shadow: 0 0 16px rgba(209, 230, 124, 0.3); }
 
+/* Icon hover bounce */
+.hover-icon { transition: transform 0.3s var(--ease-spring); }
+@media (hover: hover) {
+  .hover-icon:hover { transform: translateY(-3px) scale(1.15); }
+}
+
 .press { transition: transform 0.12s ease; }
 .press:active { transform: scale(0.96); }
 
-.tilt-card { transition: transform 0.4s var(--ease); transform-style: preserve-3d; }
-@media (hover: hover) {
-  .tilt-card:hover { transform: perspective(900px) rotateX(5deg) rotateY(-5deg) translateY(-5px); }
-}
+.tilt-card { transition: transform 0.3s var(--ease); transform-style: preserve-3d; }
 
 /* Shimmer sweep overlay */
 .shimmer-sweep { position: relative; overflow: hidden; }
@@ -161,6 +218,45 @@ body {
   animation: rippleExpand 0.6s ease-out forwards;
 }
 
+/* Click burst — secondary ring on click */
+.click-burst {
+  position: absolute; border-radius: 50%;
+  border: 2px solid rgba(28, 28, 22, 0.3);
+  pointer-events: none;
+  animation: clickBurst 0.4s ease-out forwards;
+}
+
+/* Animated underline for headings */
+.heading-underline {
+  position: relative; display: inline-block;
+}
+.heading-underline::after {
+  content: ""; position: absolute; bottom: -4px; left: 0;
+  height: 3px; width: 0;
+  background: linear-gradient(90deg, var(--bento-lime), var(--bento-olive));
+  border-radius: 2px;
+  transition: width 0.5s var(--ease);
+}
+.heading-underline.visible::after { width: 100%; }
+
+/* Animated border trace for cards */
+.border-trace {
+  position: relative; border: 2px solid var(--bento-dark);
+}
+.border-trace::before {
+  content: ""; position: absolute; inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(209, 230, 124, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: borderTrace 3s linear infinite;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+@media (hover: hover) {
+  .border-trace:hover::before { opacity: 1; }
+}
+
 /* Marquee */
 .marquee {
   display: flex; overflow: hidden; white-space: nowrap;
@@ -188,6 +284,10 @@ body {
 .reveal-right.visible { opacity: 1; transform: translateX(0); }
 .reveal-scale { opacity: 0; transform: scale(0.9); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
 .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+/* Reveal with scaleX (for bars, progress) */
+.reveal-scaleX { opacity: 0; transform: scaleX(0); transform-origin: left; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
+.reveal-scaleX.visible { opacity: 1; transform: scaleX(1); }
 
 /* Stagger */
 .stagger > * { opacity: 0; transform: translateY(20px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
@@ -218,6 +318,9 @@ body {
 
 /* Accordion smooth expand */
 .accordion-content { overflow: hidden; transition: max-height 0.35s var(--ease), opacity 0.25s ease, margin 0.35s var(--ease); }
+
+/* Slide up fade — for dynamic content appearing */
+.animate-slide-up { animation: slideUpFade 0.3s var(--ease) both; }
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
