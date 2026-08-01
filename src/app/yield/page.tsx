@@ -39,43 +39,43 @@ export default function YieldPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-4 page-enter">
+    <div className="max-w-3xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-3 md:space-y-4 page-enter pb-24 md:pb-6">
       {/* HEADER */}
-      <div className="relative rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeDown" style={{ height: "110px" }}>
-        <ProximityHover shape="diamond" fill="stroke" strokeWidth={2} particleColor="#B3E0FF" gradientColor="#D1E67C" backgroundColor="#1C1C16" maxSize={28} minSize={4} gap={8} influence={200} rotateOnHover autoPulse />
-        <div className="absolute inset-0 bg-gradient-to-r from-bento-dark/40 via-transparent to-bento-dark/30 pointer-events-none" />
-        <div className="absolute inset-0 flex items-center justify-between px-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-bento-skyblue bento-border flex items-center justify-center animate-float text-lg">📊</div>
+      <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeDown" style={{ height: 90 }}>
+        <ProximityHover shape="diamond" fill="stroke" strokeWidth={2} particleColor="#B3E0FF" gradientColor="#D1E67C" backgroundColor="#1C1C16" maxSize={26} minSize={4} gap={8} influence={180} rotateOnHover autoPulse />
+        <div className="absolute inset-0 bg-gradient-to-r from-bento-dark/45 via-transparent to-bento-dark/35 pointer-events-none" />
+        <div className="absolute inset-0 flex items-center justify-between px-4 md:px-5">
+          <div className="flex items-center gap-2.5 md:gap-3">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-bento-skyblue bento-border flex items-center justify-center animate-float text-base md:text-lg flex-shrink-0">📊</div>
             <div>
-              <h2 className="font-black text-bento-skyblue text-base drop-shadow-lg" style={{ textShadow: "0 2px 8px rgba(28,28,22,0.9)" }}>Yield Optimizer</h2>
-              <p className="text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>Crop yield calculator & revenue forecast</p>
+              <h2 className="font-black text-bento-skyblue text-sm md:text-base" style={{ textShadow: "0 2px 8px rgba(28,28,22,0.9)" }}>Yield Optimizer</h2>
+              <p className="text-[10px] md:text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>Crop yield calculator & revenue forecast</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bento-card bg-white p-5 space-y-4 animate-fadeUp hover-lift">
+      <div className="bento-card bg-white p-4 md:p-5 space-y-3 md:space-y-4 animate-fadeUp hover-lift">
         {SELECTOR_GROUPS.map((group, gi) => {
           const [current, setter] = stateMap[group.key];
           return (
-            <div key={group.key} className="animate-fadeIn" style={{ animationDelay: `${0.1 * (gi + 1)}s` }}>
-              <label className="text-sm font-black text-bento-dark mb-2 block">{group.label}</label>
-              <div className="flex flex-wrap gap-2">
+            <div key={group.key} className="animate-fadeIn" style={{ animationDelay: `${0.08 * (gi + 1)}s` }}>
+              <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block">{group.label}</label>
+              <div className="flex flex-wrap gap-1.5 md:gap-2">
                 {group.options.map((opt) => (
-                  <button key={opt} onClick={() => setter(opt)} className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all hover:scale-105 active:scale-95 ${current === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}>{opt}</button>
+                  <button key={opt} onClick={() => setter(opt)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${current === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}>{opt}</button>
                 ))}
               </div>
             </div>
           );
         })}
         <div className="animate-fadeIn delay-5">
-          <label className="text-sm font-black text-bento-dark mb-2 block">📐 Farm Area (Acres): <span className="text-bento-olive">{acres}</span></label>
+          <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block">📐 Farm Area (Acres): <span className="text-bento-olive">{acres}</span></label>
           <input type="range" min="0.5" max="50" step="0.5" value={acres} onChange={(e) => setAcres(parseFloat(e.target.value))} className="w-full accent-bento-olive transition-all" />
-          <div className="flex justify-between text-[10px] font-bold text-bento-olive"><span>0.5 acre</span><span>50 acres</span></div>
+          <div className="flex justify-between text-[10px] md:text-[10px] font-bold text-bento-olive"><span>0.5 acre</span><span>50 acres</span></div>
         </div>
-        <button onClick={(e) => { ripple(e); calculate(); }} className="w-full bg-bento-lime bento-border rounded-2xl py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all press hover-lift ripple-container overflow-hidden relative">
+        <button onClick={(e) => { ripple(e); calculate(); }} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all press hover-lift ripple-container overflow-hidden relative mobile-touch">
           📊 CALCULATE YIELD & REVENUE
         </button>
       </div>
@@ -83,45 +83,45 @@ export default function YieldPage() {
       {/* Results */}
       {result && (
         <div className="space-y-3">
-          <div className="relative rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp">
-            <div style={{ height: "40px" }}>
+          <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp">
+            <div style={{ height: 36 }}>
               <ProximityHover shape="hexagon" fill="solid" particleColor="#D1E67C" backgroundColor="#1C1C16" maxSize={16} minSize={2} gap={8} influence={140} autoPulse />
             </div>
-            <div className="bg-bento-lime p-5">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="bg-bento-lime p-4 md:p-5">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div className="animate-fadeIn delay-1">
                   <p className="text-[10px] font-black text-bento-olive uppercase">Estimated Yield</p>
-                  <p className="text-2xl font-black text-bento-dark">{result.estimatedYieldTons} tons</p>
+                  <p className="text-xl md:text-2xl font-black text-bento-dark">{result.estimatedYieldTons} tons</p>
                 </div>
                 <div className="animate-fadeIn delay-2">
                   <p className="text-[10px] font-black text-bento-olive uppercase">Est. Revenue</p>
-                  <p className="text-2xl font-black text-bento-dark">${result.estimatedRevenueUSD.toLocaleString()}</p>
+                  <p className="text-xl md:text-2xl font-black text-bento-dark">${result.estimatedRevenueUSD.toLocaleString()}</p>
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t-2 border-bento-dark/20 animate-fadeIn delay-3">
+              <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t-2 border-bento-dark/20 animate-fadeIn delay-3">
                 <p className="text-[10px] font-black text-bento-olive uppercase">Crop</p>
-                <p className="text-sm font-black text-bento-dark">{result.crop} • {result.acres} acres</p>
+                <p className="text-xs md:text-sm font-black text-bento-dark">{result.crop} • {result.acres} acres</p>
               </div>
             </div>
           </div>
 
-          <div className="relative rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp delay-2">
-            <div style={{ height: "35px" }}>
+          <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp delay-2">
+            <div style={{ height: 32 }}>
               <ProximityHover shape="star" fill="stroke" strokeWidth={1.5} particleColor="#5D621E" backgroundColor="#D7C5F0" maxSize={16} minSize={2} gap={6} influence={120} rotateOnHover />
             </div>
-            <div className="bg-bento-lavender p-4">
-              <h4 className="font-black text-bento-dark text-sm mb-2">🧪 Recommended NPK Ratio</h4>
-              <p className="text-lg font-black text-bento-dark animate-fadeIn delay-1">{result.npkRatio}</p>
+            <div className="bg-bento-lavender p-3 md:p-4">
+              <h4 className="font-black text-bento-dark text-xs md:text-sm mb-2">🧪 Recommended NPK Ratio</h4>
+              <p className="text-sm md:text-lg font-black text-bento-dark animate-fadeIn delay-1">{result.npkRatio}</p>
             </div>
           </div>
 
-          <div className="bento-card bg-white p-5 animate-fadeUp delay-3 hover-lift">
-            <h4 className="font-black text-bento-dark text-sm mb-3">📋 AI Recommendations</h4>
+          <div className="bento-card bg-white p-4 md:p-5 animate-fadeUp delay-3 hover-lift">
+            <h4 className="font-black text-bento-dark text-xs md:text-sm mb-3">📋 AI Recommendations</h4>
             <ul className="space-y-2">
               {result.recommendations.map((rec: string, i: number) => (
-                <li key={i} className="flex items-start gap-2 animate-fadeIn" style={{ animationDelay: `${0.1 * (i + 1)}s` }}>
+                <li key={i} className="flex items-start gap-2 animate-fadeIn" style={{ animationDelay: `${0.08 * (i + 1)}s` }}>
                   <span className="text-bento-lime bg-bento-dark rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black flex-shrink-0 mt-0.5">{i + 1}</span>
-                  <span className="text-sm font-medium text-bento-dark">{rec}</span>
+                  <span className="text-xs md:text-sm font-medium text-bento-dark leading-relaxed">{rec}</span>
                 </li>
               ))}
             </ul>
