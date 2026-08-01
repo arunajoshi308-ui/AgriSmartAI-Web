@@ -18,10 +18,11 @@ const baseYieldPerAcre: Record<string, number> = {
 const soilMultiplier: Record<string, number> = { "Alluvial / Loam": 1.2, "Black Soil": 1.15, "Clay Soil": 1.0, "Sandy Soil": 0.85, "Red Soil": 0.95, "Peaty Soil": 1.05 };
 const irrigationMultiplier: Record<string, number> = { "Drip Irrigation": 1.25, "Canal / Sprinkler": 1.10, "Rainfed": 0.80, "Furrow Irrigation": 1.0, "Tubewell / Borewell": 1.15 };
 const seedMultiplier: Record<string, number> = { "Hybrid High Yield": 1.20, "Certified Seed": 1.05, "Local Seed": 0.90, "Organic Seed": 0.95, "GM Seed": 1.30 };
-const pricePerTon: Record<string, number> = {
-  Wheat: 310, Rice: 380, Maize: 260, Tomato: 450, Cotton: 820, Soybean: 560,
-  Sugarcane: 50, Potato: 200, Onion: 350, Groundnut: 900, Mustard: 650,
-  Sunflower: 700, Pulses: 800, Banana: 400,
+// Prices in INR per ton (MSP-based approximate values)
+const pricePerTonINR: Record<string, number> = {
+  Wheat: 22750, Rice: 29400, Maize: 19620, Tomato: 20000, Cotton: 70200, Soybean: 48900,
+  Sugarcane: 3500, Potato: 12000, Onion: 25000, Groundnut: 63750, Mustard: 56500,
+  Sunflower: 73800, Pulses: 60000, Banana: 15000,
 };
 const npkRatios: Record<string, string> = {
   Wheat: "120 : 60 : 40 (NPK kg/ha)", Rice: "100 : 50 : 50 (NPK kg/ha)", Maize: "150 : 75 : 60 (NPK kg/ha)",
@@ -43,8 +44,15 @@ const recommendations = [
 ];
 
 interface CropResult {
-  crop: string; estimatedYieldTons: number; estimatedRevenueUSD: number;
+  crop: string; estimatedYieldTons: number; estimatedRevenueINR: number;
   npkRatio: string; isCustom: boolean; acresPerCrop: number;
+}
+
+function formatINR(val: number): string {
+  if (val >= 10000000) return (val / 10000000).toFixed(2) + " Cr";
+  if (val >= 100000) return (val / 100000).toFixed(2) + " Lakh";
+  if (val >= 1000) return val.toLocaleString("en-IN");
+  return val.toLocaleString("en-IN");
 }
 
 function CountUpStat({ target, prefix = "", suffix = "", duration = 800 }: { target: number; prefix?: string; suffix?: string; duration?: number }) {
@@ -72,7 +80,7 @@ function CropResultCard({ crop, index }: { crop: CropResult; index: number }) {
         <div className="bg-bento-peach rounded-xl p-2 md:p-2.5">
           <p className="text-[9px] font-black text-bento-olive uppercase">Revenue</p>
           <p className="text-sm md:text-lg font-black text-bento-dark">
-            $<CountUpStat target={crop.estimatedRevenueUSD} />
+            ₹<CountUpStat target={crop.estimatedRevenueINR} />
           </p>
         </div>
       </div>
@@ -91,15 +99,22 @@ export default function YieldPage() {
   const [soilType, setSoilType] = useState("Alluvial / Loam");
   const [irrigation, setIrrigation] = useState("Drip Irrigation");
   const [seedQuality, setSeedQuality] = useState("Hybrid High Yield");
+
+  // Custom input state for all fields
   const [customCrop, setCustomCrop] = useState("");
-  const [showCustom, setShowCustom] = useState(false);
+  const [showCustomCrop, setShowCustomCrop] = useState(false);
+  const [customSoil, setCustomSoil] = useState("");
+  const [showCustomSoil, setShowCustomSoil] = useState(false);
+  const [customIrr, setCustomIrr] = useState("");
+  const [showCustomIrr, setShowCustomIrr] = useState(false);
+  const [customSeed, setCustomSeed] = useState("");
+  const [showCustomSeed, setShowCustomSeed] = useState(false);
+
   const [results, setResults] = useState<{ crops: CropResult[]; totalYield: number; totalRevenue: number } | null>(null);
   const ripple = useRipple();
 
   const toggleCrop = (crop: string) => {
-    setSelectedCrops((prev) =>
-      prev.includes(crop) ? prev.filter((c) => c !== crop) : [...prev, crop]
-    );
+    setSelectedCrops((prev) => prev.includes(crop) ? prev.filter((c) => c !== crop) : [...prev, crop]);
     setResults(null);
   };
 
@@ -107,37 +122,69 @@ export default function YieldPage() {
     const name = customCrop.trim();
     if (!name || selectedCrops.includes(name)) return;
     setSelectedCrops((prev) => [...prev, name]);
-    setCustomCrop("");
-    setShowCustom(false);
-    setResults(null);
+    setCustomCrop(""); setShowCustomCrop(false); setResults(null);
   };
 
   const calculate = () => {
     if (selectedCrops.length === 0) return;
-    const soilMult = soilMultiplier[soilType] || 1.0;
-    const irrMult = irrigationMultiplier[irrigation] || 1.0;
-    const seedMult = seedMultiplier[seedQuality] || 1.0;
+    const effSoil = showCustomSoil && customSoil.trim() ? customSoil.trim() : soilType;
+    const effIrr = showCustomIrr && customIrr.trim() ? customIrr.trim() : irrigation;
+    const effSeed = showCustomSeed && customSeed.trim() ? customSeed.trim() : seedQuality;
+
+    const soilMult = soilMultiplier[effSoil] || 1.0;
+    const irrMult = irrigationMultiplier[effIrr] || 1.0;
+    const seedMult = seedMultiplier[effSeed] || 1.0;
     const acresPerCrop = acres / selectedCrops.length;
 
     const cropResults: CropResult[] = selectedCrops.map((c) => {
       const baseYield = baseYieldPerAcre[c] || 3.0;
-      const price = pricePerTon[c] || 400;
+      const price = pricePerTonINR[c] || 25000;
       const npk = npkRatios[c] || "100 : 50 : 50 (NPK kg/ha) — Estimated for custom crop";
       const totalTons = acresPerCrop * baseYield * soilMult * irrMult * seedMult;
       return {
         crop: c,
         estimatedYieldTons: Math.round(totalTons * 100) / 100,
-        estimatedRevenueUSD: Math.round(totalTons * price * 100) / 100,
+        estimatedRevenueINR: Math.round(totalTons * price),
         npkRatio: npk,
-        isCustom: !baseYieldPerAcre[c] || !pricePerTon[c],
+        isCustom: !baseYieldPerAcre[c] || !pricePerTonINR[c],
         acresPerCrop: Math.round(acresPerCrop * 100) / 100,
       };
     });
 
     const totalYield = Math.round(cropResults.reduce((sum, r) => sum + r.estimatedYieldTons, 0) * 100) / 100;
-    const totalRevenue = Math.round(cropResults.reduce((sum, r) => sum + r.estimatedRevenueUSD, 0) * 100) / 100;
+    const totalRevenue = Math.round(cropResults.reduce((sum, r) => sum + r.estimatedRevenueINR, 0));
 
     setResults({ crops: cropResults, totalYield, totalRevenue });
+  };
+
+  // Reusable single-select with custom option
+  const renderSingleSelector = (label: string, options: string[], value: string, setter: (v: string) => void, customVal: string, setCustomVal: (v: string) => void, showCustom: boolean, setShowCustom: (v: boolean) => void, delay: number) => {
+    return (
+      <div className="animate-fadeIn relative z-10" style={{ animationDelay: `${0.08 * delay}s` }}>
+        <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block heading-underline">{label}</label>
+        {!showCustom ? (
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
+            {options.map((opt) => (
+              <button key={opt} onClick={() => setter(opt)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press ${value === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`} style={{ transitionTimingFunction: "var(--ease-spring)" }}>
+                {opt}
+              </button>
+            ))}
+            <button onClick={() => setShowCustom(true)} className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1" style={{ transitionTimingFunction: "var(--ease-spring)" }}>
+              ✏️ Custom
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2 animate-fadeIn">
+            <input type="text" value={customVal} onChange={(e) => setCustomVal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && customVal.trim()) { setShowCustom(false); } }} placeholder={`Type custom ${label.split(" ").slice(1).join(" ").toLowerCase()}...`} className="flex-1 bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all" autoFocus />
+            <button onClick={() => { if (customVal.trim()) setShowCustom(false); }} disabled={!customVal.trim()} className="bg-bento-lime bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press disabled:opacity-50 mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>✓ Use</button>
+            <button onClick={() => { setShowCustom(false); setCustomVal(""); }} className="bg-bento-warm bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>← Back</button>
+          </div>
+        )}
+        {showCustom && customVal.trim() && (
+          <p className="text-[10px] font-black text-bento-olive mt-1.5">✅ Custom: <span className="text-bento-dark">{customVal.trim()}</span></p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -180,85 +227,37 @@ export default function YieldPage() {
           )}
 
           {/* Crop options — multi-select toggle + inline Custom button */}
-          {!showCustom ? (
+          {!showCustomCrop ? (
             <div className="flex flex-wrap gap-1.5 md:gap-2">
               {CROPS.map((crop) => {
                 const isSelected = selectedCrops.includes(crop);
                 return (
-                  <button
-                    key={crop}
-                    onClick={() => toggleCrop(crop)}
-                    className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press flex items-center gap-1 ${isSelected ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}
-                    style={{ transitionTimingFunction: "var(--ease-spring)" }}
-                  >
+                  <button key={crop} onClick={() => toggleCrop(crop)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press flex items-center gap-1 ${isSelected ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`} style={{ transitionTimingFunction: "var(--ease-spring)" }}>
                     {isSelected && <span className="text-[10px]">✓</span>}
                     {cropEmojis[crop] || "🌱"} {crop}
                   </button>
                 );
               })}
-              <button
-                onClick={() => setShowCustom(true)}
-                className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1"
-                style={{ transitionTimingFunction: "var(--ease-spring)" }}
-              >
-                ✏️ Custom
-              </button>
+              <button onClick={() => setShowCustomCrop(true)} className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1" style={{ transitionTimingFunction: "var(--ease-spring)" }}>✏️ Custom</button>
             </div>
           ) : (
             <div className="flex gap-2 animate-fadeIn">
-              <input
-                type="text"
-                value={customCrop}
-                onChange={(e) => setCustomCrop(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && addCustomCrop()}
-                placeholder="Type crop name (e.g. Coffee, Grapes, Tobacco...)"
-                className="flex-1 bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all"
-                autoFocus
-              />
-              <button
-                onClick={addCustomCrop}
-                disabled={!customCrop.trim()}
-                className="bg-bento-lime bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press disabled:opacity-50 mobile-touch"
-                style={{ transitionTimingFunction: "var(--ease-spring)" }}
-              >
-                + Add
-              </button>
-              <button
-                onClick={() => { setShowCustom(false); setCustomCrop(""); }}
-                className="bg-bento-warm bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press mobile-touch"
-                style={{ transitionTimingFunction: "var(--ease-spring)" }}
-              >
-                ← Back
-              </button>
+              <input type="text" value={customCrop} onChange={(e) => setCustomCrop(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addCustomCrop()} placeholder="Type crop name (e.g. Coffee, Grapes, Tobacco...)" className="flex-1 bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all" autoFocus />
+              <button onClick={addCustomCrop} disabled={!customCrop.trim()} className="bg-bento-lime bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press disabled:opacity-50 mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>+ Add</button>
+              <button onClick={() => { setShowCustomCrop(false); setCustomCrop(""); }} className="bg-bento-warm bento-border rounded-xl px-4 py-2.5 font-black text-xs text-bento-dark hover:scale-105 active:scale-95 transition-all press mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>← Back</button>
             </div>
           )}
-          {selectedCrops.length === 0 && (
-            <p className="text-[10px] font-bold text-red-500 mt-2">⚠️ Please select at least one crop</p>
-          )}
+          {selectedCrops.length === 0 && <p className="text-[10px] font-bold text-red-500 mt-2">⚠️ Please select at least one crop</p>}
         </div>
 
-        {/* SOIL / IRRIGATION / SEED — single select */}
-        {[
-          { label: "🟫 Soil Type", value: soilType, setter: setSoilType, options: SOIL_TYPES },
-          { label: "💧 Irrigation", value: irrigation, setter: setIrrigation, options: IRRIGATION },
-          { label: "🌱 Seed Quality", value: seedQuality, setter: setSeedQuality, options: SEED_QUALITY },
-        ].map((group, gi) => (
-          <div key={group.label} className="animate-fadeIn relative z-10" style={{ animationDelay: `${0.08 * (gi + 2)}s` }}>
-            <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block heading-underline">{group.label}</label>
-            <div className="flex flex-wrap gap-1.5 md:gap-2">
-              {group.options.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => group.setter(opt)}
-                  className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch press ${group.value === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}
-                  style={{ transitionTimingFunction: "var(--ease-spring)" }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+        {/* SOIL TYPE — with Custom */}
+        {renderSingleSelector("🟫 Soil Type", SOIL_TYPES, soilType, setSoilType, customSoil, setCustomSoil, showCustomSoil, setShowCustomSoil, 2)}
+
+        {/* IRRIGATION — with Custom */}
+        {renderSingleSelector("💧 Irrigation", IRRIGATION, irrigation, setIrrigation, customIrr, setCustomIrr, showCustomIrr, setShowCustomIrr, 3)}
+
+        {/* SEED QUALITY — with Custom */}
+        {renderSingleSelector("🌱 Seed Quality", SEED_QUALITY, seedQuality, setSeedQuality, customSeed, setCustomSeed, showCustomSeed, setShowCustomSeed, 4)}
 
         {/* ACREAGE SLIDER */}
         <div className="animate-fadeIn delay-5 relative z-10">
@@ -271,12 +270,7 @@ export default function YieldPage() {
         </div>
 
         {/* CALCULATE BUTTON */}
-        <button
-          onClick={(e) => { ripple(e); calculate(); }}
-          disabled={selectedCrops.length === 0}
-          className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark btn-anim btn-glow-trail active:scale-95 transition-all disabled:opacity-50 press hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep relative z-10"
-          style={{ transitionTimingFunction: "var(--ease-spring)" }}
-        >
+        <button onClick={(e) => { ripple(e); calculate(); }} disabled={selectedCrops.length === 0} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark btn-anim btn-glow-trail active:scale-95 transition-all disabled:opacity-50 press hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep relative z-10" style={{ transitionTimingFunction: "var(--ease-spring)" }}>
           📊 CALCULATE YIELD & REVENUE {selectedCrops.length > 1 && `(${selectedCrops.length} CROPS)`}
         </button>
       </div>
@@ -304,8 +298,8 @@ export default function YieldPage() {
                 </div>
                 <div className="animate-fadeIn delay-2">
                   <p className="text-[10px] font-black text-bento-olive uppercase">Total Revenue</p>
-                  <p className="text-xl md:text-2xl font-black text-bento-dark">
-                    $<CountUpStat target={results.totalRevenue} duration={1000} />
+                  <p className="text-lg md:text-2xl font-black text-bento-dark">
+                    ₹<CountUpStat target={results.totalRevenue} duration={1000} />
                   </p>
                 </div>
               </div>
@@ -328,7 +322,7 @@ export default function YieldPage() {
             </div>
           )}
 
-          {/* NPK (if single crop, show inline; if multi, it's in per-crop cards) */}
+          {/* NPK (single crop only) */}
           {results.crops.length === 1 && (
             <div className="relative rounded-[20px] md:rounded-[28px] overflow-hidden border-2 border-bento-dark animate-fadeUp delay-2">
               <div style={{ height: 32 }}>
