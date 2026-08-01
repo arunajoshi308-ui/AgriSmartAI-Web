@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bento-bg: #FAFAF8;
+  --bento-dark: #1C1C16;
+  --bento-lime: #D1E67C;
+  --bento-olive: #5D621E;
+  --bento-warm: #E7E9D9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bento-bg);
+  color: var(--bento-dark);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Bento border style */
+.bento-border {
+  border: 2px solid var(--bento-dark);
+}
+
+.bento-card {
+  border: 2px solid var(--bento-dark);
+  border-radius: 28px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #5D621E33;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5D621E66;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 1.5s ease-in-out infinite;
+}
+
+/* Chat markdown */
+.chat-markdown p { margin: 0.25rem 0; }
+.chat-markdown ul { list-style: disc; padding-left: 1.25rem; margin: 0.25rem 0; }
+.chat-markdown ol { list-style: decimal; padding-left: 1.25rem; margin: 0.25rem 0; }
+.chat-markdown strong { font-weight: 700; }
+.chat-markdown code { background: #00000015; padding: 2px 6px; border-radius: 4px; font-size: 0.875em; }

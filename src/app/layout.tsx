@@ -1,0 +1,38 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+
+export const metadata: Metadata = {
+  title: "AgriSmart AI — Crop Yield Optimizer & Plant Disease Detector",
+  description:
+    "AI Crop Yield Optimizer & Real-time Plant Disease Detector created by Class 9 Student Innovators. Powered by Gemini AI.",
+  keywords: ["agriculture", "AI", "crop yield", "plant disease", "farming", "Gemini"],
+  openGraph: {
+    title: "AgriSmart AI",
+    description: "AI Crop Yield Optimizer & Real-time Plant Disease Detector",
+    type: "website",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <Navbar />
+        <main className="min-h-screen pb-20">{children}</main>
+        <footer className="border-t-2 border-bento-dark bg-bento-dark text-bento-bg px-6 py-8 text-center">
+          <p className="text-sm font-bold">
+            AgriSmart AI 🌾 — Built by Class 9 Student Innovators
+          </p>
+          <p className="text-xs mt-1 text-bento-lime">
+            Powered by Gemini 3.5 Flash • Open Source on GitHub
+          </p>
+        </footer>
+      </body>
+    </html>
+  );
+}
