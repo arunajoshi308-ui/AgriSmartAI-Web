@@ -3,35 +3,7 @@
 import { useRef, type MouseEvent } from "react";
 
 /**
- * Magnetic hover hook — element follows the cursor slightly.
- * Usage: const { ref, handleMove, handleLeave } = useMagnetic();
- * <button ref={ref} onMouseMove={handleMove} onMouseLeave={handleLeave} className="magnetic">...</button>
- */
-export function useMagnetic(strength = 0.3) {
-  const ref = useRef<HTMLElement>(null);
-
-  const handleMove = (e: MouseEvent<HTMLElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    el.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
-  };
-
-  const handleLeave = () => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.transform = "translate(0, 0)";
-  };
-
-  return { ref, handleMove, handleLeave };
-}
-
-/**
  * Ripple click effect — adds expanding circle on click.
- * Usage: const handleRipple = useRipple();
- * <button onClick={handleRipple} className="ripple-container">...</button>
  */
 export function useRipple() {
   return (e: MouseEvent<HTMLElement>) => {
@@ -47,4 +19,29 @@ export function useRipple() {
     el.appendChild(ripple);
     setTimeout(() => ripple.remove(), 600);
   };
+}
+
+/**
+ * Reveal on scroll — add to any element with className "reveal"
+ */
+export function useScrollReveal() {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const init = () => {
+    if (typeof window === "undefined") return;
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observerRef.current?.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+    document.querySelectorAll(".reveal").forEach((el) => observerRef.current?.observe(el));
+  };
+
+  return { init, observerRef };
 }
