@@ -9,11 +9,15 @@ const SUGGESTIONS = [
   "🧪 Best NPK for clay soil?",
   "🐛 Organic pest control for tomatoes",
   "💧 Drought irrigation tips",
+  "📚 Explain photosynthesis simply",
+  "💻 Help me with Python code",
+  "🧮 Solve 15% of 240",
+  "✍️ Write a short poem about farming",
 ];
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { id: 0, sender: "BOT", text: "🌱 Hello! I'm AgriSmart AI, your digital crop yield optimizer and plant health assistant built by Class 9 Student Innovators. How can I assist your farm today?" },
+    { id: 0, sender: "BOT", text: "🌱 Hello! I'm AgriSmart AI — your all-round AI assistant built by Class 9 Student Innovators.\n\nI'm an expert in agriculture 🌾, but I can also help with homework 📚, coding 💻, writing ✍️, math 🧮, or just about anything else you're curious about!\n\nWhat can I help you with today?" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,8 +52,8 @@ export default function ChatPage() {
           <div className="flex items-center gap-2.5 md:gap-3">
             <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-bento-lavender bento-border flex items-center justify-center animate-float text-base md:text-lg flex-shrink-0">🧠</div>
             <div>
-              <h2 className="font-black text-bento-lavender text-sm md:text-base" style={{ textShadow: "0 2px 8px rgba(28,28,22,0.9)" }}>AI Crop Advisor</h2>
-              <p className="text-[10px] md:text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>Gemini 3.5 Flash • Class 9 Innovation</p>
+              <h2 className="font-black text-bento-lavender text-sm md:text-base" style={{ textShadow: "0 2px 8px rgba(28,28,22,0.9)" }}>AI Assistant</h2>
+              <p className="text-[10px] md:text-xs font-bold text-bento-lime" style={{ textShadow: "0 1px 6px rgba(28,28,22,0.8)" }}>Ask me anything • Gemini 3.5 Flash</p>
             </div>
           </div>
           <div className="bg-bento-lime bento-border rounded-xl px-2 py-1 flex-shrink-0 animate-gentle-bounce">
@@ -61,7 +65,7 @@ export default function ChatPage() {
       {/* Suggestions */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-2">
         {SUGGESTIONS.map((s, i) => (
-          <button key={s} onClick={() => sendMessage(s.split(" ").slice(1).join(" "))} className="flex-shrink-0 bg-white bento-border rounded-xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all animate-fadeIn mobile-touch" style={{ animationDelay: `${0.08 * (i + 1)}s` }}>{s}</button>
+          <button key={s} onClick={() => sendMessage(s.split(" ").slice(1).join(" "))} className="flex-shrink-0 bg-white bento-border rounded-xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all animate-fadeIn mobile-touch" style={{ animationDelay: `${0.05 * (i + 1)}s` }}>{s}</button>
         ))}
       </div>
 
@@ -94,7 +98,7 @@ export default function ChatPage() {
 
       {/* Input */}
       <div className="bento-border bg-white p-2 flex gap-2 mt-2 animate-fadeUp hover-lift">
-        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage(input)} placeholder="Ask about crops, soil, pests..." className="flex-1 px-3 md:px-4 py-2.5 text-sm font-medium bg-bento-bg rounded-xl focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all" />
+        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage(input)} placeholder="Ask me anything..." className="flex-1 px-3 md:px-4 py-2.5 text-sm font-medium bg-bento-bg rounded-xl focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all" />
         <button onClick={() => sendMessage(input)} disabled={loading} className="bg-bento-lime bento-border rounded-xl px-4 py-2.5 font-black text-sm text-bento-dark hover:scale-105 active:scale-95 transition-all disabled:opacity-50 press mobile-touch">Send ➤</button>
       </div>
     </div>

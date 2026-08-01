@@ -4,22 +4,49 @@ import { useState } from "react";
 import ProximityHover from "@/components/ProximityHover";
 import { useRipple } from "@/hooks/useAnimations";
 
-const CROPS = ["Wheat", "Rice", "Maize", "Tomato", "Cotton", "Soybean"];
-const SOIL_TYPES = ["Alluvial / Loam", "Black Soil", "Clay Soil", "Sandy Soil"];
-const IRRIGATION = ["Drip Irrigation", "Canal / Sprinkler", "Rainfed"];
-const SEED_QUALITY = ["Hybrid High Yield", "Certified Seed", "Local Seed"];
-const baseYieldPerAcre: Record<string, number> = { Wheat: 2.8, Rice: 3.5, Maize: 4.2, Tomato: 18.0, Cotton: 1.5, Soybean: 2.5 };
-const soilMultiplier: Record<string, number> = { "Alluvial / Loam": 1.2, "Black Soil": 1.15, "Clay Soil": 1.0, "Sandy Soil": 0.85 };
-const irrigationMultiplier: Record<string, number> = { "Drip Irrigation": 1.25, "Canal / Sprinkler": 1.10, "Rainfed": 0.80 };
-const seedMultiplier: Record<string, number> = { "Hybrid High Yield": 1.20, "Certified Seed": 1.05, "Local Seed": 0.90 };
-const pricePerTon: Record<string, number> = { Wheat: 310, Rice: 380, Maize: 260, Tomato: 450, Cotton: 820, Soybean: 560 };
-const npkRatios: Record<string, string> = { Wheat: "120 : 60 : 40 (NPK kg/ha)", Rice: "100 : 50 : 50 (NPK kg/ha)", Maize: "150 : 75 : 60 (NPK kg/ha)", Tomato: "180 : 90 : 120 (NPK kg/ha)", Cotton: "90 : 45 : 45 (NPK kg/ha)", Soybean: "30 : 60 : 40 (NPK kg/ha)" };
-const recommendations = ["Apply 50% Nitrogen during land prep and 50% at vegetative split.", "Maintain soil moisture at field capacity during seed germination.", "Spray micro-nutrient mixture (Zinc + Iron + Boron) at 30 days post-sowing.", "Deploy AgriSmart AI Disease Scanner weekly for early leaf rust protection."];
-const SELECTOR_GROUPS = [
-  { label: "🌾 Crop Type", key: "crop", options: CROPS, emoji: "🌾" },
-  { label: "🟫 Soil Type", key: "soil", options: SOIL_TYPES, emoji: "🟫" },
-  { label: "💧 Irrigation", key: "irrigation", options: IRRIGATION, emoji: "💧" },
-  { label: "🌱 Seed Quality", key: "seed", options: SEED_QUALITY, emoji: "🌱" },
+const CROPS = ["Wheat", "Rice", "Maize", "Tomato", "Cotton", "Soybean", "Sugarcane", "Potato", "Onion", "Groundnut", "Mustard", "Sunflower", "Pulses", "Banana"];
+const SOIL_TYPES = ["Alluvial / Loam", "Black Soil", "Clay Soil", "Sandy Soil", "Red Soil", "Peaty Soil"];
+const IRRIGATION = ["Drip Irrigation", "Canal / Sprinkler", "Rainfed", "Furrow Irrigation", "Tubewell / Borewell"];
+const SEED_QUALITY = ["Hybrid High Yield", "Certified Seed", "Local Seed", "Organic Seed", "GM Seed"];
+
+const baseYieldPerAcre: Record<string, number> = {
+  Wheat: 2.8, Rice: 3.5, Maize: 4.2, Tomato: 18.0, Cotton: 1.5, Soybean: 2.5,
+  Sugarcane: 35.0, Potato: 12.0, Onion: 10.0, Groundnut: 1.2, Mustard: 1.5,
+  Sunflower: 1.0, Pulses: 0.8, Banana: 15.0,
+};
+const soilMultiplier: Record<string, number> = { "Alluvial / Loam": 1.2, "Black Soil": 1.15, "Clay Soil": 1.0, "Sandy Soil": 0.85, "Red Soil": 0.95, "Peaty Soil": 1.05 };
+const irrigationMultiplier: Record<string, number> = { "Drip Irrigation": 1.25, "Canal / Sprinkler": 1.10, "Rainfed": 0.80, "Furrow Irrigation": 1.0, "Tubewell / Borewell": 1.15 };
+const seedMultiplier: Record<string, number> = { "Hybrid High Yield": 1.20, "Certified Seed": 1.05, "Local Seed": 0.90, "Organic Seed": 0.95, "GM Seed": 1.30 };
+const pricePerTon: Record<string, number> = {
+  Wheat: 310, Rice: 380, Maize: 260, Tomato: 450, Cotton: 820, Soybean: 560,
+  Sugarcane: 50, Potato: 200, Onion: 350, Groundnut: 900, Mustard: 650,
+  Sunflower: 700, Pulses: 800, Banana: 400,
+};
+const npkRatios: Record<string, string> = {
+  Wheat: "120 : 60 : 40 (NPK kg/ha)", Rice: "100 : 50 : 50 (NPK kg/ha)", Maize: "150 : 75 : 60 (NPK kg/ha)",
+  Tomato: "180 : 90 : 120 (NPK kg/ha)", Cotton: "90 : 45 : 45 (NPK kg/ha)", Soybean: "30 : 60 : 40 (NPK kg/ha)",
+  Sugarcane: "250 : 120 : 80 (NPK kg/ha)", Potato: "200 : 100 : 150 (NPK kg/ha)", Onion: "120 : 60 : 60 (NPK kg/ha)",
+  Groundnut: "25 : 50 : 40 (NPK kg/ha)", Mustard: "100 : 50 : 30 (NPK kg/ha)", Sunflower: "80 : 60 : 40 (NPK kg/ha)",
+  Pulses: "20 : 60 : 30 (NPK kg/ha)", Banana: "200 : 110 : 220 (NPK kg/ha)",
+};
+const recommendations = [
+  "Apply 50% Nitrogen during land prep and 50% at vegetative split.",
+  "Maintain soil moisture at field capacity during seed germination.",
+  "Spray micro-nutrient mixture (Zinc + Iron + Boron) at 30 days post-sowing.",
+  "Deploy AgriSmart AI Disease Scanner weekly for early leaf rust protection.",
+];
+
+interface SelectorGroup {
+  label: string;
+  key: string;
+  options: string[];
+}
+
+const SELECTOR_GROUPS: SelectorGroup[] = [
+  { label: "🌾 Crop Type", key: "crop", options: CROPS },
+  { label: "🟫 Soil Type", key: "soil", options: SOIL_TYPES },
+  { label: "💧 Irrigation", key: "irrigation", options: IRRIGATION },
+  { label: "🌱 Seed Quality", key: "seed", options: SEED_QUALITY },
 ];
 
 export default function YieldPage() {
@@ -28,6 +55,8 @@ export default function YieldPage() {
   const [soilType, setSoilType] = useState("Alluvial / Loam");
   const [irrigation, setIrrigation] = useState("Drip Irrigation");
   const [seedQuality, setSeedQuality] = useState("Hybrid High Yield");
+  const [customInputs, setCustomInputs] = useState<Record<string, string>>({});
+  const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
   const [result, setResult] = useState<any>(null);
   const ripple = useRipple();
 
@@ -35,9 +64,92 @@ export default function YieldPage() {
     crop: [crop, setCrop], soil: [soilType, setSoilType], irrigation: [irrigation, setIrrigation], seed: [seedQuality, setSeedQuality],
   };
 
+  // Get effective value (custom or preset)
+  const getEffectiveValue = (key: string): string => {
+    if (customMode[key] && customInputs[key]?.trim()) return customInputs[key].trim();
+    return stateMap[key][0];
+  };
+
   const calculate = () => {
-    const totalTons = acres * (baseYieldPerAcre[crop] || 3.0) * (soilMultiplier[soilType] || 1.0) * (irrigationMultiplier[irrigation] || 1.0) * (seedMultiplier[seedQuality] || 1.0);
-    setResult({ crop, acres, estimatedYieldTons: Math.round(totalTons * 100) / 100, estimatedRevenueUSD: Math.round(totalTons * (pricePerTon[crop] || 350) * 100) / 100, npkRatio: npkRatios[crop] || "100 : 50 : 50 (NPK kg/ha)", recommendations });
+    const effCrop = getEffectiveValue("crop");
+    const effSoil = getEffectiveValue("soil");
+    const effIrr = getEffectiveValue("irrigation");
+    const effSeed = getEffectiveValue("seed");
+
+    // Use known values or sensible defaults for custom entries
+    const baseYield = baseYieldPerAcre[effCrop] || 3.0; // default 3 tons/acre for unknown crops
+    const soilMult = soilMultiplier[effSoil] || 1.0;    // default neutral for custom soil
+    const irrMult = irrigationMultiplier[effIrr] || 1.0;
+    const seedMult = seedMultiplier[effSeed] || 1.0;
+    const price = pricePerTon[effCrop] || 400; // default $400/ton for unknown crops
+    const npk = npkRatios[effCrop] || "100 : 50 : 50 (NPK kg/ha) — Estimated for custom crop";
+
+    const totalTons = acres * baseYield * soilMult * irrMult * seedMult;
+    setResult({
+      crop: effCrop, acres,
+      estimatedYieldTons: Math.round(totalTons * 100) / 100,
+      estimatedRevenueUSD: Math.round(totalTons * price * 100) / 100,
+      npkRatio: npk,
+      isCustom: !baseYieldPerAcre[effCrop] || !pricePerTon[effCrop],
+      recommendations,
+    });
+  };
+
+  const renderSelector = (group: SelectorGroup, gi: number) => {
+    const [current, setter] = stateMap[group.key];
+    const isCustom = customMode[group.key];
+    const customVal = customInputs[group.key] || "";
+
+    return (
+      <div key={group.key} className="animate-fadeIn relative z-10" style={{ animationDelay: `${0.08 * (gi + 1)}s` }}>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs md:text-sm font-black text-bento-dark">{group.label}</label>
+          {isCustom && (
+            <button
+              onClick={() => setCustomMode({ ...customMode, [group.key]: false })}
+              className="text-[10px] font-black text-bento-olive hover:text-bento-dark press"
+            >
+              ← Back to list
+            </button>
+          )}
+        </div>
+        {!isCustom ? (
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
+            {group.options.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => setter(opt)}
+                className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${current === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}
+              >
+                {opt}
+              </button>
+            ))}
+            <button
+              onClick={() => setCustomMode({ ...customMode, [group.key]: true })}
+              className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1"
+            >
+              ✏️ Custom
+            </button>
+          </div>
+        ) : (
+          <div className="animate-fadeIn">
+            <input
+              type="text"
+              value={customVal}
+              onChange={(e) => setCustomInputs({ ...customInputs, [group.key]: e.target.value })}
+              placeholder={`Type custom ${group.label.split(" ").slice(1).join(" ").toLowerCase()}...`}
+              className="w-full bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all"
+              autoFocus
+            />
+            {customVal.trim() && (
+              <p className="text-[10px] font-black text-bento-olive mt-1.5">
+                ✅ Custom: <span className="text-bento-dark">{customVal.trim()}</span>
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -60,19 +172,7 @@ export default function YieldPage() {
       {/* Form */}
       <div className="bento-card bg-white p-4 md:p-5 space-y-3 md:space-y-4 animate-fadeUp hover-lift relative overflow-hidden">
         <div className="absolute -bottom-2 -right-2 text-4xl opacity-10 animate-float-sway select-none">📈</div>
-        {SELECTOR_GROUPS.map((group, gi) => {
-          const [current, setter] = stateMap[group.key];
-          return (
-            <div key={group.key} className="animate-fadeIn relative z-10" style={{ animationDelay: `${0.08 * (gi + 1)}s` }}>
-              <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block">{group.label}</label>
-              <div className="flex flex-wrap gap-1.5 md:gap-2">
-                {group.options.map((opt) => (
-                  <button key={opt} onClick={() => setter(opt)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${current === opt ? "bg-bento-dark text-white animate-pop" : "bg-bento-warm bento-border text-bento-dark hover:bg-bento-lime"}`}>{opt}</button>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        {SELECTOR_GROUPS.map((group, gi) => renderSelector(group, gi))}
         <div className="animate-fadeIn delay-5 relative z-10">
           <label className="text-xs md:text-sm font-black text-bento-dark mb-2 block">📐 Farm Area (Acres): <span className="text-bento-olive">{acres}</span></label>
           <input type="range" min="0.5" max="50" step="0.5" value={acres} onChange={(e) => setAcres(parseFloat(e.target.value))} className="w-full accent-bento-olive transition-all" />
@@ -105,6 +205,9 @@ export default function YieldPage() {
               <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t-2 border-bento-dark/20 animate-fadeIn delay-3 relative z-10">
                 <p className="text-[10px] font-black text-bento-olive uppercase">Crop</p>
                 <p className="text-xs md:text-sm font-black text-bento-dark">{result.crop} • {result.acres} acres</p>
+                {result.isCustom && (
+                  <p className="text-[9px] font-bold text-bento-olive mt-1">💡 Estimated values for custom crop — AI used sensible defaults</p>
+                )}
               </div>
             </div>
           </div>

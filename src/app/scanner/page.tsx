@@ -10,7 +10,11 @@ interface Diagnosis {
   symptoms: string; organicTreatment: string; chemicalTreatment: string; prevention: string;
 }
 
-const CROPS = ["Tomato", "Wheat", "Rice", "Maize", "Cotton", "Potato", "Chili", "General"];
+const CROPS = [
+  "Tomato", "Wheat", "Rice", "Maize", "Cotton", "Potato", "Chili",
+  "Soybean", "Sugarcane", "Onion", "Garlic", "Banana", "Mango",
+  "Groundnut", "Mustard", "Sunflower", "Pulses", "General"
+];
 const statusColors: Record<string, string> = {
   HEALTHY: "bg-green-200 text-green-900", WARNING: "bg-yellow-200 text-yellow-900", DISEASED: "bg-red-200 text-red-900",
 };
@@ -18,11 +22,15 @@ const statusColors: Record<string, string> = {
 export default function ScannerPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [cropHint, setCropHint] = useState("Tomato");
+  const [customCrop, setCustomCrop] = useState("");
+  const [showCustom, setShowCustom] = useState(false);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ripple = useRipple();
+
+  const activeCrop = showCustom && customCrop.trim() ? customCrop.trim() : cropHint;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,10 +45,10 @@ export default function ScannerPage() {
     setLoading(true); setDiagnosis(null);
     const base64 = selectedImage.split(",")[1] || selectedImage;
     try {
-      const resp = await fetch("/api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: base64, cropHint }) });
+      const resp = await fetch("/api/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: base64, cropHint: activeCrop }) });
       setDiagnosis(await resp.json());
     } catch {
-      setDiagnosis({ cropName: cropHint, diseaseName: "Analysis Error", healthStatus: "WARNING", confidence: 0, symptoms: "Could not analyze image.", organicTreatment: "", chemicalTreatment: "", prevention: "" });
+      setDiagnosis({ cropName: activeCrop, diseaseName: "Analysis Error", healthStatus: "WARNING", confidence: 0, symptoms: "Could not analyze image.", organicTreatment: "", chemicalTreatment: "", prevention: "" });
     } finally { setLoading(false); }
   };
 
@@ -91,19 +99,43 @@ export default function ScannerPage() {
         <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileSelect} className="hidden" />
       </div>
 
-      {/* Crop Selector */}
+      {/* Crop Selector with Custom Option */}
       <div className="bento-card bg-bento-warm p-3 md:p-4 animate-fadeUp delay-2 hover-lift relative overflow-hidden">
         <div className="absolute -top-2 -right-2 text-3xl opacity-10 animate-sway select-none">🌾</div>
-        <p className="text-xs md:text-sm font-black text-bento-dark mb-2 md:mb-3 relative z-10">Select Crop Category:</p>
-        <div className="flex flex-wrap gap-1.5 md:gap-2 relative z-10">
-          {CROPS.map((crop) => (
-            <button key={crop} onClick={() => setCropHint(crop)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${cropHint === crop ? "bg-bento-dark text-white animate-pop" : "bg-white bento-border text-bento-dark hover:bg-bento-lime"}`}>{crop}</button>
-          ))}
+        <div className="flex items-center justify-between mb-2 md:mb-3 relative z-10">
+          <p className="text-xs md:text-sm font-black text-bento-dark">Select Crop Category:</p>
+          {showCustom && (
+            <button onClick={() => { setShowCustom(false); setCustomCrop(""); }} className="text-[10px] font-black text-bento-olive hover:text-bento-dark press">← Back to list</button>
+          )}
         </div>
+        {!showCustom ? (
+          <div className="flex flex-wrap gap-1.5 md:gap-2 relative z-10">
+            {CROPS.map((crop) => (
+              <button key={crop} onClick={() => setCropHint(crop)} className={`px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch ${cropHint === crop ? "bg-bento-dark text-white animate-pop" : "bg-white bento-border text-bento-dark hover:bg-bento-lime"}`}>{crop}</button>
+            ))}
+            <button onClick={() => setShowCustom(true)} className="px-2.5 md:px-3 py-1.5 rounded-xl text-[11px] md:text-xs font-black transition-all hover:scale-105 active:scale-95 mobile-touch bg-bento-lavender bento-border text-bento-dark hover:bg-bento-lime flex items-center gap-1">
+              ✏️ Custom
+            </button>
+          </div>
+        ) : (
+          <div className="relative z-10 animate-fadeIn">
+            <input
+              type="text"
+              value={customCrop}
+              onChange={(e) => setCustomCrop(e.target.value)}
+              placeholder="Type your crop name (e.g. Coffee, Tobacco, Grapes...)"
+              className="w-full bento-border rounded-xl px-3 py-2.5 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all"
+              autoFocus
+            />
+            {customCrop.trim() && (
+              <p className="text-[10px] font-black text-bento-olive mt-2">✅ Custom crop: <span className="text-bento-dark">{customCrop.trim()}</span></p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Analyze */}
-      <button onClick={(e) => { ripple(e); analyzeImage(); }} disabled={!selectedImage || loading} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 press animate-fadeUp delay-3 hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep">
+      <button onClick={(e) => { ripple(e); analyzeImage(); }} disabled={!selectedImage || loading || (showCustom && !customCrop.trim())} className="w-full bg-bento-lime bento-border rounded-2xl py-3 md:py-3.5 font-black text-sm text-bento-dark hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 press animate-fadeUp delay-3 hover-lift ripple-container overflow-hidden relative mobile-touch shimmer-sweep">
         {loading ? (
           <span className="flex items-center justify-center gap-2"><div className="w-5 h-5 border-2 border-bento-dark border-t-transparent rounded-full animate-spin" />Analyzing leaf...</span>
         ) : "🔬 ANALYZE WITH AI"}
