@@ -24,7 +24,9 @@ export default function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    }
   }, [messages.length, loading]);
 
   const sendMessage = async (text: string) => {
@@ -63,17 +65,17 @@ export default function ChatPage() {
       </div>
 
       {/* Suggestions */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-2" style={{ scrollbarWidth: "none" }}>
         {SUGGESTIONS.map((s, i) => (
-          <button key={s} onClick={() => sendMessage(s.split(" ").slice(1).join(" "))} className="flex-shrink-0 bg-white bento-border rounded-xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all animate-fadeIn mobile-touch" style={{ animationDelay: `${0.05 * (i + 1)}s` }}>{s}</button>
+          <button key={s} onClick={() => sendMessage(s.split(" ").slice(1).join(" "))} className="flex-shrink-0 bg-white bento-border rounded-xl px-3 py-1.5 text-[11px] font-black text-bento-dark hover:bg-bento-lime hover:scale-105 active:scale-95 transition-all animate-fadeIn mobile-touch" style={{ animationDelay: `${0.05 * (i + 1)}s`, transitionTimingFunction: "var(--ease)" }}>{s}</button>
         ))}
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-2.5 md:space-y-3 px-1">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-2.5 md:space-y-3 px-1" style={{ scrollBehavior: "smooth" }}>
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.sender === "USER" ? "justify-end" : "justify-start"} animate-fadeUp`}>
-            <div className={`max-w-[85%] rounded-2xl p-2.5 md:p-3 transition-transform hover:scale-[1.01] ${msg.sender === "USER" ? "bg-bento-dark text-white" : "bg-white bento-border text-bento-dark"}`}>
+            <div className={`max-w-[85%] rounded-2xl p-2.5 md:p-3 transition-all hover:scale-[1.01] ${msg.sender === "USER" ? "bg-bento-dark text-white" : "bg-white bento-border text-bento-dark"}`} style={{ transitionTimingFunction: "var(--ease)" }}>
               {msg.sender === "BOT" && (
                 <div className="flex items-center gap-1.5 mb-1">
                   <div className="w-5 h-5 rounded-full bg-bento-lime bento-border flex items-center justify-center text-[10px] animate-float flex-shrink-0">🌱</div>
@@ -87,7 +89,7 @@ export default function ChatPage() {
         {loading && (
           <div className="flex items-center gap-2 animate-fadeIn">
             <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-bento-lime bento-border flex items-center justify-center text-xs animate-float flex-shrink-0">🌱</div>
-            <div className="flex items-center gap-1.5">
+            <div className="bg-white bento-border rounded-2xl px-4 py-3 flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-bento-olive loading-dot" />
               <div className="w-2 h-2 rounded-full bg-bento-olive loading-dot" style={{ animationDelay: "0.2s" }} />
               <div className="w-2 h-2 rounded-full bg-bento-olive loading-dot" style={{ animationDelay: "0.4s" }} />
@@ -99,7 +101,7 @@ export default function ChatPage() {
       {/* Input */}
       <div className="bento-border bg-white p-2 flex gap-2 mt-2 animate-fadeUp hover-lift">
         <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage(input)} placeholder="Ask me anything..." className="flex-1 px-3 md:px-4 py-2.5 text-sm font-medium bg-bento-bg rounded-xl focus:outline-none focus:ring-2 focus:ring-bento-lime transition-all" />
-        <button onClick={() => sendMessage(input)} disabled={loading} className="bg-bento-lime bento-border rounded-xl px-4 py-2.5 font-black text-sm text-bento-dark hover:scale-105 active:scale-95 transition-all disabled:opacity-50 press mobile-touch">Send ➤</button>
+        <button onClick={() => sendMessage(input)} disabled={loading} className="bg-bento-lime bento-border rounded-xl px-4 py-2.5 font-black text-sm text-bento-dark hover:scale-105 active:scale-95 transition-all disabled:opacity-50 press mobile-touch" style={{ transitionTimingFunction: "var(--ease-spring)" }}>Send ➤</button>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import FloatingEmojis from "@/components/FloatingEmojis";
+import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
   title: "AgriSmart AI — Crop Yield Optimizer & Plant Disease Detector",
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <ScrollProgress />
         <FloatingEmojis count={12} />
         <Navbar />
         <main className="min-h-screen pb-20 relative" style={{ zIndex: 1 }}>{children}</main>
